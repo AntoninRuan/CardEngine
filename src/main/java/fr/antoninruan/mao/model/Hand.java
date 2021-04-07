@@ -1,6 +1,7 @@
 package fr.antoninruan.mao.model;
 
 import fr.antoninruan.mao.MainApp;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.image.ImageView;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 public class Hand {
 
-    private final int id;
+    private int id;
 
     private final double baseX;
     private final double baseY;
@@ -51,36 +52,55 @@ public class Hand {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public ImageView add(Card card) {
         ImageView view = visible ? new ImageView(card.getImage()) : new ImageView(Deck.BLUEBACK);
         view.setPreserveRatio(true);
         view.setFitHeight(cardHeight);
 
-        view.setOnDragDetected(event -> {
-            if(event.getButton() == MouseButton.PRIMARY) {
-                Dragboard dragboard = view.startDragAndDrop(TransferMode.MOVE);
-                ClipboardContent content = new ClipboardContent();
-                dragboard.setContent(content);
-            }
-        });
+        if(visible)
+            view.setOnDragDetected(event -> {
+                if(event.getButton() == MouseButton.PRIMARY) {
+                    Dragboard dragboard = view.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString("hand" + "." + id + "." + keys.indexOf(card));
+                    dragboard.setContent(content);
+                }
+            });
+
 
         keys.add(card);
         cards.put(card, view);
 
-        updateHand();
+        Platform.runLater(() -> {
+            updateHand();
 
-        container.getChildren().add(view);
+            container.getChildren().add(view);
+        });
 
         return view;
     }
 
     public ImageView remove(Card card) {
         ImageView view = cards.get(card);
-        container.getChildren().remove(view);
-        keys.remove(card);
-        cards.remove(card);
-        updateHand();
+        Platform.runLater(() -> {
+            container.getChildren().remove(view);
+            keys.remove(card);
+            cards.remove(card);
+            updateHand();
+        });
         return view;
+    }
+
+    public Card getCard(int id) {
+        return keys.get(id);
+    }
+
+    public int getCardId(Card card) {
+        return keys.indexOf(card);
     }
 
     public ArrayList<Card> getCards() {

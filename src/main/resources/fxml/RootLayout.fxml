@@ -17,8 +17,7 @@
             </ImageView>
             <Pane fx:id="area">
                <children>
-                  <AnchorPane fx:id="hand1" layoutX="34.0" layoutY="93.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="161.0" prefWidth="441.0" rotate="120.0" scaleX="0.7" scaleY="0.7" style="-fx-border-color: #000;" visible="false" />
-                  <AnchorPane fx:id="hand0" layoutX="374.0" layoutY="606.0" prefHeight="230.0" prefWidth="630.0" />
+                  <AnchorPane fx:id="hand" layoutX="374.0" layoutY="606.0" prefHeight="230.0" prefWidth="630.0" />
                   <StackPane fx:id="deck" layoutX="537.0" layoutY="335.0" prefHeight="180.0" prefWidth="128.0" style="-fx-border-color: #000; -fx-border-radius: 5px;" />
                   <StackPane fx:id="playedStack" layoutX="718.0" layoutY="335.0" prefHeight="180.0" prefWidth="128.0" style="-fx-border-color: #000; -fx-border-radius: 5px;" />
                </children>

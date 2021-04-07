@@ -1,6 +1,7 @@
 package fr.antoninruan.mao.model;
 
 import fr.antoninruan.mao.MainApp;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -21,16 +22,20 @@ public class PlayedStack {
                 if(change.wasAdded()) {
                     List<? extends Card> added = change.getAddedSubList();
                     for (Card card : added) {
-                        ImageView view = MainApp.getRootController().addPlayedCard(card);
-                        cards.put(card, view);
+                        Platform.runLater(() -> {
+                            ImageView view = MainApp.getRootController().addPlayedCard(card);
+                            cards.put(card, view);
+                        });
                     }
                 } else if(change.wasRemoved()) {
                     List<? extends Card> removed = change.getRemoved();
                     for(Card card : removed) {
-                        ImageView view = cards.get(card);
-                        MainApp.getRootController().removePlayerCard(view);
-                        cards.remove(card);
-                        keys.remove(card);
+                        Platform.runLater(() -> {
+                            ImageView view = cards.get(card);
+                            MainApp.getRootController().removePlayerCard(view);
+                            cards.remove(card);
+                            keys.remove(card);
+                        });
                     }
                 }
             }
