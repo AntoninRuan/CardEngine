@@ -10,7 +10,10 @@ import fr.antoninruan.mao.model.Card;
 import fr.antoninruan.mao.model.Deck;
 import fr.antoninruan.mao.model.Hand;
 import fr.antoninruan.mao.model.PlayedStack;
+import fr.antoninruan.mao.view.RootLayoutController;
 import javafx.application.Platform;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +39,7 @@ public class RabbitMQManager {
         factory.setUsername(user);
         factory.setPassword(password);
         factory.setAutomaticRecoveryEnabled(true);
+        factory.setVirtualHost("card_engine");
         try {
             connection = factory.newConnection();
             channel = connection.createChannel();
@@ -47,14 +51,18 @@ public class RabbitMQManager {
             channel.exchangeDeclare(EXCHANGE_GAME_UPDATES, "fanout");
             channel.queueDeclare(QUEUE_GAME_ACTION, true, false, false, null);
 
-            listenGameUpdate();
         } catch (TimeoutException | IOException e) {
             e.printStackTrace();
+            MainApp.getPrimaryStage().close();
         }
     }
 
     public static void stop() {
         try {
+            JsonObject object = new JsonObject();
+            object.addProperty("type", "player_leave");
+            object.addProperty("id", MainApp.getRootController().getOwnHand().getId());
+            sendGameAction(object.toString());
             channel.close();
             connection.close();
         } catch (IOException | TimeoutException e) {
@@ -101,7 +109,7 @@ public class RabbitMQManager {
         }
     }
 
-    private static void listenGameUpdate() throws IOException {
+    public static void listenGameUpdate() throws IOException {
         String queue = channel.queueDeclare().getQueue();
         channel.queueBind(queue, EXCHANGE_GAME_UPDATES, "");
 
@@ -109,6 +117,7 @@ public class RabbitMQManager {
             try {
                 JsonObject update = JsonParser.parseString(new String(delivery.getBody(), StandardCharsets.UTF_8)).getAsJsonObject();
                 String type = update.get("type").getAsString();
+                System.out.println("Receive: " + update.toString());
                 if(type.equals("new_player")) {
 //                    System.out.println("broadcast=" + update);
                     String name = update.get("name").getAsString();
@@ -117,6 +126,9 @@ public class RabbitMQManager {
                     System.out.println("ownId=" + MainApp.getRootController().getOwnId());
                     if(update.get("id").getAsInt() != MainApp.getRootController().getOwnId())
                         Platform.runLater(() -> MainApp.getRootController().addPlayer(name, id));
+                } else if(type.equals("player_leave")) {
+                    int leaveId = update.get("id").getAsInt();
+
                 } else if (type.equals("card_move")) {
                     String dest = update.get("destination").getAsString();
                     String from = update.get("source").getAsString();
@@ -160,9 +172,14 @@ public class RabbitMQManager {
                     }
                 } else if (type.equals("shuffle")) {
                     Deck.setFromJson(update.get("deck").getAsJsonArray());
+                    Platform.runLater(() -> new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/shuffle.mp3").toString())).play());
                 } else if(type.equals("rollback")) {
                     Deck.setFromJson(update.get("deck").getAsJsonArray());
                     PlayedStack.getCards().clear();
+                } else if(type.equals("knock")) {
+                    Platform.runLater(() -> new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/knock.mp3").toString())).play());
+                } else if(type.equals("rub")) {
+                    Platform.runLater(() -> new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/rub.mp3").toString())).play());
                 }
             } catch (Exception e) {
                 e.printStackTrace();

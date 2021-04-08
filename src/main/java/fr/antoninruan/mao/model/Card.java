@@ -75,182 +75,125 @@ public class Card {
 
     public static Card getCard(Suit suit, Value value) {
         switch (suit) {
-            case SPADE -> {
+            case SPADE:
                 switch (value) {
 
-                    case AS -> {
+                    case AS:
                         return SPADE_AS;
-                    }
-                    case KING -> {
+                    case KING:
                         return SPADE_KING;
-                    }
-                    case QUEEN -> {
+                    case QUEEN:
                         return SPADE_QUEEN;
-                    }
-                    case JACK -> {
+                    case JACK :
                         return SPADE_JACK;
-                    }
-                    case TEN -> {
+                    case TEN:
                         return SPADE_TEN;
-                    }
-                    case NINE -> {
+                    case NINE:
                         return SPADE_NINE;
-                    }
-                    case EIGHT -> {
+                    case EIGHT:
                         return SPADE_EIGHT;
-                    }
-                    case SEVEN -> {
+                    case SEVEN:
                         return SPADE_SEVEN;
-                    }
-                    case SIX -> {
+                    case SIX:
                         return SPADE_SIX;
-                    }
-                    case FIVE -> {
+                    case FIVE:
                         return SPADE_FIVE;
-                    }
-                    case FOUR -> {
+                    case FOUR:
                         return SPADE_FOUR;
-                    }
-                    case THREE -> {
+                    case THREE:
                         return SPADE_THREE;
-                    }
-                    case TWO -> {
+                    case TWO:
                         return SPADE_TWO;
-                    }
                 }
-            }
-            case CLUB -> {
+            case HEART:
                 switch (value) {
 
-                    case AS -> {
-                        return CLUB_AS;
-                    }
-                    case KING -> {
-                        return CLUB_KING;
-                    }
-                    case QUEEN -> {
-                        return CLUB_QUEEN;
-                    }
-                    case JACK -> {
-                        return CLUB_JACK;
-                    }
-                    case TEN -> {
-                        return CLUB_TEN;
-                    }
-                    case NINE -> {
-                        return CLUB_NINE;
-                    }
-                    case EIGHT -> {
-                        return CLUB_EIGHT;
-                    }
-                    case SEVEN -> {
-                        return CLUB_SEVEN;
-                    }
-                    case SIX -> {
-                        return CLUB_SIX;
-                    }
-                    case FIVE -> {
-                        return CLUB_FIVE;
-                    }
-                    case FOUR -> {
-                        return CLUB_FOUR;
-                    }
-                    case THREE -> {
-                        return CLUB_THREE;
-                    }
-                    case TWO -> {
-                        return CLUB_TWO;
-                    }
-                }
-            }
-            case HEART -> {
-                switch (value) {
-
-                    case AS -> {
+                    case AS:
                         return HEART_AS;
-                    }
-                    case KING -> {
+                    case KING:
                         return HEART_KING;
-                    }
-                    case QUEEN -> {
+                    case QUEEN:
                         return HEART_QUEEN;
-                    }
-                    case JACK -> {
+                    case JACK :
                         return HEART_JACK;
-                    }
-                    case TEN -> {
+                    case TEN:
                         return HEART_TEN;
-                    }
-                    case NINE -> {
+                    case NINE:
                         return HEART_NINE;
-                    }
-                    case EIGHT -> {
+                    case EIGHT:
                         return HEART_EIGHT;
-                    }
-                    case SEVEN -> {
+                    case SEVEN:
                         return HEART_SEVEN;
-                    }
-                    case SIX -> {
+                    case SIX:
                         return HEART_SIX;
-                    }
-                    case FIVE -> {
+                    case FIVE:
                         return HEART_FIVE;
-                    }
-                    case FOUR -> {
+                    case FOUR:
                         return HEART_FOUR;
-                    }
-                    case THREE -> {
+                    case THREE:
                         return HEART_THREE;
-                    }
-                    case TWO -> {
+                    case TWO:
                         return HEART_TWO;
-                    }
                 }
-            }
-            case DIAMOND -> {
+            case DIAMOND:
                 switch (value) {
 
-                    case AS -> {
+                    case AS:
                         return DIAMOND_AS;
-                    }
-                    case KING -> {
+                    case KING:
                         return DIAMOND_KING;
-                    }
-                    case QUEEN -> {
+                    case QUEEN:
                         return DIAMOND_QUEEN;
-                    }
-                    case JACK -> {
+                    case JACK :
                         return DIAMOND_JACK;
-                    }
-                    case TEN -> {
+                    case TEN:
                         return DIAMOND_TEN;
-                    }
-                    case NINE -> {
+                    case NINE:
                         return DIAMOND_NINE;
-                    }
-                    case EIGHT -> {
+                    case EIGHT:
                         return DIAMOND_EIGHT;
-                    }
-                    case SEVEN -> {
+                    case SEVEN:
                         return DIAMOND_SEVEN;
-                    }
-                    case SIX -> {
+                    case SIX:
                         return DIAMOND_SIX;
-                    }
-                    case FIVE -> {
+                    case FIVE:
                         return DIAMOND_FIVE;
-                    }
-                    case FOUR -> {
+                    case FOUR:
                         return DIAMOND_FOUR;
-                    }
-                    case THREE -> {
+                    case THREE:
                         return DIAMOND_THREE;
-                    }
-                    case TWO -> {
+                    case TWO:
                         return DIAMOND_TWO;
-                    }
                 }
-            }
+            case CLUB:
+                switch (value) {
+                    case AS:
+                        return CLUB_AS;
+                    case KING:
+                        return CLUB_KING;
+                    case QUEEN:
+                        return CLUB_QUEEN;
+                    case JACK :
+                        return CLUB_JACK;
+                    case TEN:
+                        return CLUB_TEN;
+                    case NINE:
+                        return CLUB_NINE;
+                    case EIGHT:
+                        return CLUB_EIGHT;
+                    case SEVEN:
+                        return CLUB_SEVEN;
+                    case SIX:
+                        return CLUB_SIX;
+                    case FIVE:
+                        return CLUB_FIVE;
+                    case FOUR:
+                        return CLUB_FOUR;
+                    case THREE:
+                        return CLUB_THREE;
+                    case TWO:
+                        return CLUB_TWO;
+                }
         }
         return null;
     }

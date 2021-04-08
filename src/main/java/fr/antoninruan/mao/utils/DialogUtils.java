@@ -3,15 +3,18 @@ package fr.antoninruan.mao.utils;
 import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.ConnectionInfo;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
+import java.text.DecimalFormat;
 import java.util.Optional;
 
 public class DialogUtils {
+
+    private static final DecimalFormat decimalFormat = new DecimalFormat("00");
 
     public static Optional<ConnectionInfo> connect() {
         Dialog<ConnectionInfo> dialog = new Dialog<>();
@@ -35,10 +38,35 @@ public class DialogUtils {
         TextField username = new TextField();
         username.setPromptText("Pseudo");
 
+        ChoiceBox<Integer> scale = new ChoiceBox<>();
+        scale.getItems().setAll(100, 75, 50);
+        scale.setConverter(new StringConverter<Integer>() {
+            @Override
+            public String toString(Integer integer) {
+                return integer + " %";
+            }
+
+            @Override
+            public Integer fromString(String s) {
+                return Integer.parseInt(s.split(" ")[0]);
+            }
+        });
+        scale.getSelectionModel().select((Integer) 100);
+
+        /*Slider slider = new Slider();                  // LES
+        slider.setValue(100);                          // COUILLES
+        slider.setMajorTickUnit(1);
+        slider.setMinorTickCount(100);
+        slider.valueProperty().addListener((observableValue, oldValue0, newValue) -> {
+            scale.setText("Echelle (" + decimalFormat.format(newValue) + ")");
+        });*/
+
         gridPane.add(new Label("Serveur"), 0, 0);
         gridPane.add(host, 1, 0);
         gridPane.add(new Label("Pseudo"), 0, 1);
         gridPane.add(username, 1, 1);
+        gridPane.add(new Label("Échelle"), 0, 2);
+        gridPane.add(scale, 1, 2);
 
         dialog.getDialogPane().setContent(gridPane);
 //        dialog.getDialogPane().getStylesheets().add(DialogUtils.class.getClassLoader().getResource("style/dialog.css").toString());
@@ -47,7 +75,7 @@ public class DialogUtils {
 
         dialog.setResultConverter(dialogButton -> {
             if(dialogButton == validationButtonType) {
-                return new ConnectionInfo(host.getText(), username.getText());
+                return new ConnectionInfo(host.getText(), username.getText(), ((double) scale.getSelectionModel().getSelectedItem()/ 100.));
             }
             return null;
         });

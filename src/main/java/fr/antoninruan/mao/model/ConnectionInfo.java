@@ -4,10 +4,12 @@ public class ConnectionInfo {
 
     private String host;
     private String name;
+    private double scale;
 
-    public ConnectionInfo(String host, String name) {
+    public ConnectionInfo(String host, String name, double scale) {
         this.host = host;
         this.name = name;
+        this.scale = scale;
     }
 
     public String getHost() {
@@ -16,5 +18,9 @@ public class ConnectionInfo {
 
     public String getName() {
         return name;
+    }
+
+    public double getScale() {
+        return scale;
     }
 }

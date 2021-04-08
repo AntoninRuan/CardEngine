@@ -1,6 +1,7 @@
 package fr.antoninruan.mao.view;
 
 import com.google.gson.JsonObject;
+import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.*;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
 import javafx.fxml.FXML;
@@ -11,6 +12,8 @@ import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -22,6 +25,9 @@ public class RootLayoutController {
     private final HashMap<Integer, List<Point2D>> positions = new HashMap<>();
 
     private int ownId;
+
+    @FXML
+    private StackPane layout;
 
     @FXML
     private Pane area;
@@ -100,6 +106,19 @@ public class RootLayoutController {
                     object.addProperty("source", "playedStack");
                 }
                 object.addProperty("destination", "deck");
+                RabbitMQManager.sendGameAction(object.toString());
+            }
+        });
+
+        hand.setOnMouseClicked(mouseEvent -> {
+            if(mouseEvent.isControlDown() && mouseEvent.getButton() == MouseButton.SECONDARY) {
+                JsonObject object = new JsonObject();
+                object.addProperty("type", "knock");
+                RabbitMQManager.sendGameAction(object.toString());
+//                System.out.println("knock");
+            } else if(mouseEvent.isAltDown() && mouseEvent.getButton() == MouseButton.PRIMARY) {
+                JsonObject object = new JsonObject();
+                object.addProperty("type", "rub");
                 RabbitMQManager.sendGameAction(object.toString());
             }
         });
@@ -383,4 +402,7 @@ public class RootLayoutController {
             return others.get(id);
     }
 
+    public StackPane getLayout() {
+        return layout;
+    }
 }
