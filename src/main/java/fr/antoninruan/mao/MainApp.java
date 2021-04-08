@@ -127,6 +127,7 @@ public class MainApp extends Application {
             primaryStage.setResizable(false);
             primaryStage.show();
             primaryStage.toFront();
+            primaryStage.requestFocus();
 
         } catch (IOException e) {
             e.printStackTrace();

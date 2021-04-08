@@ -51,7 +51,7 @@ public class DialogUtils {
                 return Integer.parseInt(s.split(" ")[0]);
             }
         });
-        scale.getSelectionModel().select((Integer) 100);
+        scale.getSelectionModel().select((Integer) 75);
 
         /*Slider slider = new Slider();                  // LES
         slider.setValue(100);                          // COUILLES

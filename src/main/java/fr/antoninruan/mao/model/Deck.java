@@ -24,19 +24,15 @@ public class Deck {
     static {
         deck.addListener((ListChangeListener<? super Card>) change -> {
             while (change.next()) {
-                if(change.wasRemoved()) {
-                    for(Card ignored : change.getRemoved()) {
-                        Platform.runLater(() -> MainApp.getRootController().removeDeckCard());
-                    }
-                }
+                if(change.wasRemoved())
+                    Platform.runLater(() -> MainApp.getRootController().removeDeckCard(change.getRemovedSize()));
                 else if (change.wasAdded())
-                    for(Card ignored : change.getAddedSubList())
-                        Platform.runLater(() -> MainApp.getRootController().addDeckCard());
+                    Platform.runLater(() -> MainApp.getRootController().addDeckCard(change.getAddedSize()));
             }
         });
     }
 
-    public static void init() {
+/*    public static void init() {
         for (Card.Suit s : Card.Suit.values()) {
             for (Card.Value v : Card.Value.values()) {
 //                deck.add(new Card(s, v));
@@ -49,7 +45,7 @@ public class Deck {
         Collections.shuffle(d);
         deck.clear();
         deck.addAll(d);
-    }
+    }*/
 
     public static ObservableList<Card> getDeck() {
         return deck;
@@ -73,15 +69,16 @@ public class Deck {
     }
 
     public static void setFromJson(JsonArray jsonArray) {
-        ArrayList<Card> deck = new ArrayList<>();
+        System.out.println("New deck: " + jsonArray.toString());
+//        ArrayList<Card> deck = new ArrayList<>();
+        Deck.getDeck().clear();
         for (JsonElement element : jsonArray) {
             JsonObject object = element.getAsJsonObject();
             String suit = object.get("suit").getAsString();
             String value = object.get("value").getAsString();
-            deck.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
+            Deck.put(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
         }
-        Deck.getDeck().clear();
-        Deck.getDeck().setAll(deck);
+//        Deck.getDeck().setAll(deck);
     }
 
 }

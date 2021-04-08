@@ -122,13 +122,12 @@ public class RabbitMQManager {
 //                    System.out.println("broadcast=" + update);
                     String name = update.get("name").getAsString();
                     int id = update.get("id").getAsInt();
-                    System.out.println("h[0]=" + update.get("id").getAsInt());
-                    System.out.println("ownId=" + MainApp.getRootController().getOwnId());
                     if(update.get("id").getAsInt() != MainApp.getRootController().getOwnId())
                         Platform.runLater(() -> MainApp.getRootController().addPlayer(name, id));
                 } else if(type.equals("player_leave")) {
                     int leaveId = update.get("id").getAsInt();
-
+                    Platform.runLater(() -> MainApp.getRootController().removePlayer(leaveId));
+                    Deck.setFromJson(update.get("deck").getAsJsonArray());
                 } else if (type.equals("card_move")) {
                     String dest = update.get("destination").getAsString();
                     String from = update.get("source").getAsString();

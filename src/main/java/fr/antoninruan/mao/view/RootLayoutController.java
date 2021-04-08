@@ -1,21 +1,25 @@
 package fr.antoninruan.mao.view;
 
 import com.google.gson.JsonObject;
-import fr.antoninruan.mao.MainApp;
-import fr.antoninruan.mao.model.*;
+import fr.antoninruan.mao.model.Card;
+import fr.antoninruan.mao.model.Deck;
+import fr.antoninruan.mao.model.Hand;
+import fr.antoninruan.mao.model.PlayedStack;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,17 +48,13 @@ public class RootLayoutController {
     private final Hand ownHand = new Hand(0, 261, 1050, 0, 25, 1015, true, 150);
 
     private final HashMap<Hand, Pane> hands = new HashMap<>();
-    private final HashMap<Integer, Hand> others = new HashMap<>();
-    private final ArrayList<Integer> usedIds = new ArrayList<>();
 
     @FXML
     private void initialize() {
 
         initPosition();
 
-        for(int i = 0; i < Deck.getSize(); i ++) {
-            addDeckCard();
-        }
+        addDeckCard(Deck.getSize());
 
         ownHand.setContainer(hand);
 
@@ -249,25 +249,28 @@ public class RootLayoutController {
         return ownHand;
     }
 
-    public void removeDeckCard() {
-        deck.getChildren().remove(deck.getChildren().size() - 1);
+    public void removeDeckCard(int number) {
+        for (int i = 0; i < number; i ++)
+            deck.getChildren().remove(deck.getChildren().size() - 1);
     }
 
-    public void addDeckCard() {
-        ImageView view = new ImageView(Deck.BLUEBACK);
-        view.setPreserveRatio(true);
-        view.setFitHeight(150);
-        Random random = new Random();
+    public void addDeckCard(int number) {
+        for (int i = 0; i < number; i ++) {
+            ImageView view = new ImageView(Deck.BLUEBACK);
+            view.setPreserveRatio(true);
+            view.setFitHeight(150);
+            Random random = new Random();
 
-        int rotate = random.nextInt(11) - 5;
-        int translateX = random.nextInt(11) - 5;
-        int translateY = random.nextInt(11) - 5;
+            int rotate = random.nextInt(11) - 5;
+            int translateX = random.nextInt(11) - 5;
+            int translateY = random.nextInt(11) - 5;
 
-        view.setRotate(rotate);
-        view.setTranslateX(translateX);
-        view.setTranslateY(translateY);
+            view.setRotate(rotate);
+            view.setTranslateX(translateX);
+            view.setTranslateY(translateY);
 
-        deck.getChildren().add(view);
+            deck.getChildren().add(view);
+        }
     }
 
     public ImageView addPlayedCard(Card card) {
@@ -294,7 +297,7 @@ public class RootLayoutController {
     }
 
     public void addPlayer(String name, int id) {
-        if(others.size() >= positions.keySet().size())
+        if(hands.size() >= positions.keySet().size())
             return;
         AnchorPane pane = new AnchorPane();
         pane.setStyle("-fx-border-color: #000");
@@ -343,19 +346,20 @@ public class RootLayoutController {
             }
         });
 
-        usedIds.add(id);
-        others.put(id, hand);
+//        usedIds.add(id);
+//        others.put(id, hand);
         hands.put(hand, pane);
 
         updateHands();
     }
 
     private void updateHands() {
-        List<Point2D> positions = this.positions.get(others.size() - 1);
-        double angle = 360. / (double) (others.size() + 1);
+        List<Point2D> positions = this.positions.get(hands.size() - 1);
+        double angle = 360. / (double) (hands.size() + 1);
         int j = 0;
-        for(int i : usedIds.stream().sorted(Comparator.comparingInt(o -> rotate(o, usedIds.size()))).collect(Collectors.toList())) {
-            Hand hand = others.get(i);
+        List<Pair<Integer, Hand>> sortedHandId = hands.keySet().stream().map(h -> new Pair<>(h.getId(), h)).sorted(Comparator.comparingInt(o -> rotate(o.getKey(), hands.size()))).collect(Collectors.toList());
+        for(Pair<Integer, Hand> pair : sortedHandId) {
+            Hand hand = pair.getValue();
             Pane pane = hands.get(hand);
             Point2D point = positions.get(j);
             pane.setLayoutX(point.getX());
@@ -372,17 +376,25 @@ public class RootLayoutController {
     }
 
     public void removePlayer(int id) {
-        Hand hand = others.get(id);
+        Hand hand = hands.keySet().stream().filter(h -> h.getId() == id).findFirst().get();
+
         if(!hand.getCards().isEmpty()) {
             for(Card card : new ArrayList<>(hand.getCards())) {
                 hand.remove(card);
                 Deck.put(card);
             }
         }
-        usedIds.remove((Integer) hand.getId());
-        others.remove(hand.getId());
+//        usedIds.remove((Integer) hand.getId());
+//        others.remove(hand.getId());
         area.getChildren().remove(hands.get(hand));
         hands.remove(hand);
+        for (Hand h : hands.keySet().stream().filter(h -> h.getId() > id).collect(Collectors.toList())) {
+            h.setId(h.getId() - 1);
+        }
+        if(ownId > id) {
+            this.ownId --;
+            this.ownHand.setId(ownId);
+        }
         updateHands();
     }
 
@@ -399,7 +411,7 @@ public class RootLayoutController {
         if(id == ownId)
             return ownHand;
         else
-            return others.get(id);
+            return hands.keySet().stream().filter(h -> h.getId() == id).findFirst().get();
     }
 
     public StackPane getLayout() {
