@@ -1,0 +1,13 @@
+.scroll-pane{
+    -fx-background-color: #1D4719;
+}
+
+.scroll-pane .scroll-bar:horizontal {
+    -fx-background-color:  #1D4719;
+    -fx-border-color: #2B6A25;
+    -fx-border-radius: 2px;
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb {
+    -fx-background-color: #2B6A25;
+}
