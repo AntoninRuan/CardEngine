@@ -117,7 +117,7 @@ public class RabbitMQManager {
             try {
                 JsonObject update = JsonParser.parseString(new String(delivery.getBody(), StandardCharsets.UTF_8)).getAsJsonObject();
                 String type = update.get("type").getAsString();
-                System.out.println("Receive: " + update.toString());
+//                System.out.println("Receive: " + update.toString());
                 if(type.equals("new_player")) {
 //                    System.out.println("broadcast=" + update);
                     String name = update.get("name").getAsString();
@@ -169,6 +169,7 @@ public class RabbitMQManager {
                             hand.remove(card);
                         }
                     }
+                    Platform.runLater(new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/card_move.mp3").toString()))::play);
                 } else if (type.equals("shuffle")) {
                     Deck.setFromJson(update.get("deck").getAsJsonArray());
                     Platform.runLater(() -> new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/shuffle.mp3").toString())).play());

@@ -3,10 +3,7 @@ package fr.antoninruan.mao;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import fr.antoninruan.mao.model.Card;
-import fr.antoninruan.mao.model.ConnectionInfo;
-import fr.antoninruan.mao.model.Deck;
-import fr.antoninruan.mao.model.PlayedStack;
+import fr.antoninruan.mao.model.*;
 import fr.antoninruan.mao.utils.DialogUtils;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
 import fr.antoninruan.mao.view.RootLayoutController;
@@ -52,11 +49,16 @@ public class MainApp extends Application {
             RabbitMQManager.init(info.getHost(), 5672, "card_engine", "zHaBdgLr388");
             JsonObject response = JsonParser.parseString(RabbitMQManager.connect(info.getName())).getAsJsonObject();
             rootController.setOwnId(response.get("id").getAsInt());
-            System.out.println("response=" + response.toString());
+//            System.out.println("response=" + response);
             for (JsonElement element : response.get("players").getAsJsonArray()) {
                 JsonObject p = element.getAsJsonObject();
-                System.out.println("Player=" + p.toString());
-                rootController.addPlayer(p.get("name").getAsString(), p.get("id").getAsInt());
+//                System.out.println("Player=" + p.toString());
+                Hand h = rootController.addPlayer(p.get("name").getAsString(), p.get("id").getAsInt());
+                for(JsonElement card : p.get("cards").getAsJsonArray()) {
+                    String suit = card.getAsJsonObject().get("suit").getAsString();
+                    String value = card.getAsJsonObject().get("value").getAsString();
+                    h.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
+                }
             }
             Deck.setFromJson(response.get("deck").getAsJsonArray());
             ArrayList<Card> playedStack = new ArrayList<>();
@@ -69,7 +71,7 @@ public class MainApp extends Application {
             PlayedStack.getCards().setAll(playedStack);
             primaryStage.setTitle(info.getName());
 //            primaryStage.setFullScreen(true);
-            System.out.println(info.getName());
+//            System.out.println(info.getName());
             RabbitMQManager.listenGameUpdate();
         } else {
             primaryStage.close();

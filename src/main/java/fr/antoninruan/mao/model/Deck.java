@@ -69,7 +69,7 @@ public class Deck {
     }
 
     public static void setFromJson(JsonArray jsonArray) {
-        System.out.println("New deck: " + jsonArray.toString());
+//        System.out.println("New deck: " + jsonArray.toString());
 //        ArrayList<Card> deck = new ArrayList<>();
         Deck.getDeck().clear();
         for (JsonElement element : jsonArray) {

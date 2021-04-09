@@ -151,7 +151,7 @@ public class RootLayoutController {
 
         playedStack.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.isAltDown() && mouseEvent.getButton() == MouseButton.MIDDLE) {
-                System.out.println("Rollback");
+//                System.out.println("Rollback");
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "rollback");
                 RabbitMQManager.sendGameAction(object.toString());
@@ -296,9 +296,9 @@ public class RootLayoutController {
         playedStack.getChildren().remove(view);
     }
 
-    public void addPlayer(String name, int id) {
+    public Hand addPlayer(String name, int id) {
         if(hands.size() >= positions.keySet().size())
-            return;
+            return null;
         AnchorPane pane = new AnchorPane();
         pane.setStyle("-fx-border-color: #000");
         pane.setPrefWidth(441);
@@ -351,6 +351,7 @@ public class RootLayoutController {
         hands.put(hand, pane);
 
         updateHands();
+        return hand;
     }
 
     private void updateHands() {

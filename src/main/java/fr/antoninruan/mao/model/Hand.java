@@ -61,7 +61,8 @@ public class Hand {
         view.setPreserveRatio(true);
         view.setFitHeight(cardHeight);
 
-        if(visible)
+        if(visible) {
+            view.setStyle("-fx-border-color: #121212");
             view.setOnDragDetected(event -> {
                 if(event.getButton() == MouseButton.PRIMARY) {
                     Dragboard dragboard = view.startDragAndDrop(TransferMode.MOVE);
@@ -70,6 +71,7 @@ public class Hand {
                     dragboard.setContent(content);
                 }
             });
+        }
 
 
         keys.add(card);

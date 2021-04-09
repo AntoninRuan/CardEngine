@@ -53,14 +53,6 @@ public class DialogUtils {
         });
         scale.getSelectionModel().select((Integer) 75);
 
-        /*Slider slider = new Slider();                  // LES
-        slider.setValue(100);                          // COUILLES
-        slider.setMajorTickUnit(1);
-        slider.setMinorTickCount(100);
-        slider.valueProperty().addListener((observableValue, oldValue0, newValue) -> {
-            scale.setText("Echelle (" + decimalFormat.format(newValue) + ")");
-        });*/
-
         gridPane.add(new Label("Serveur"), 0, 0);
         gridPane.add(host, 1, 0);
         gridPane.add(new Label("Pseudo"), 0, 1);
@@ -69,8 +61,6 @@ public class DialogUtils {
         gridPane.add(scale, 1, 2);
 
         dialog.getDialogPane().setContent(gridPane);
-//        dialog.getDialogPane().getStylesheets().add(DialogUtils.class.getClassLoader().getResource("style/dialog.css").toString());
-//        dialog.getDialogPane().getStyleClass().add("myDialog");
         ((Stage)dialog.getDialogPane().getScene().getWindow()).getIcons().add(MainApp.ICON);
 
         dialog.setResultConverter(dialogButton -> {
