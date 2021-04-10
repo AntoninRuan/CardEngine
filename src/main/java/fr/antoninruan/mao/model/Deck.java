@@ -9,6 +9,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +57,20 @@ public class Deck {
         return deck.size();
     }
 
+    public static Pair<Card, ImageView> getLastCard() {
+        if(deck.isEmpty())
+            return null;
+        ImageView view = (ImageView) MainApp.getRootController().getDeck().getChildren().get(MainApp.getRootController().getDeck().getChildren().size() - 1);
+        return new Pair<Card, ImageView>(deck.get(deck.size() - 1), view);
+    }
+
+    public static void removeLast() {
+        if(deck.isEmpty())
+            return;
+
+        deck.remove(deck.size() - 1);
+    }
+
     public static Card draw() {
         if (deck.isEmpty())
             return null;
@@ -69,8 +85,6 @@ public class Deck {
     }
 
     public static void setFromJson(JsonArray jsonArray) {
-//        System.out.println("New deck: " + jsonArray.toString());
-//        ArrayList<Card> deck = new ArrayList<>();
         Deck.getDeck().clear();
         for (JsonElement element : jsonArray) {
             JsonObject object = element.getAsJsonObject();
@@ -78,7 +92,6 @@ public class Deck {
             String value = object.get("value").getAsString();
             Deck.put(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
         }
-//        Deck.getDeck().setAll(deck);
     }
 
 }

@@ -44,6 +44,10 @@ public class Hand {
         this.cardHeight = cardHeight;
     }
 
+    public Pane getContainer() {
+        return container;
+    }
+
     public void setContainer(Pane container) {
         this.container = container;
     }
@@ -107,6 +111,10 @@ public class Hand {
 
     public ArrayList<Card> getCards() {
         return keys;
+    }
+
+    public ImageView getView(Card card) {
+        return cards.get(card);
     }
 
     private void updateHand() {

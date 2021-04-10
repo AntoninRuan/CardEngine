@@ -132,36 +132,59 @@ public class RabbitMQManager {
                     String dest = update.get("destination").getAsString();
                     String from = update.get("source").getAsString();
                     if(from.equals("deck")) {
-                        Card card = Deck.draw();
+                        Pair<Card, ImageView> card = Deck.getLastCard();
                         if(card != null) {
                             if(dest.equals("playedStack")) {
-                                PlayedStack.addCard(card);
+                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getDeck(), card.getValue(),
+                                        MainApp.getRootController().getPlayedStack(), () -> {
+                                            Deck.removeLast();
+                                            PlayedStack.addCard(card.getKey());
+                                        });
                             } else {
                                 int destId = Integer.parseInt(dest);
                                 Hand hand = MainApp.getRootController().getHand(destId);
-                                hand.add(card);
+                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getDeck(), card.getValue(),
+                                        hand.getContainer(), () -> {
+                                            Deck.removeLast();
+                                            hand.add(card.getKey());
+                                        });
                             }
                         }
                     } else if (from.equals("playedStack")) {
-                        Card card = PlayedStack.pickLastCard();
+                        Card card = PlayedStack.getLastCard();
                         if(card != null) {
                             if(dest.equals("deck")) {
-                                Deck.put(card);
+                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getPlayedStack(), PlayedStack.getView(card),
+                                        MainApp.getRootController().getDeck(), () -> {
+                                            PlayedStack.removeLastCard();
+                                            Deck.put(card);
+                                        });
                             } else {
                                 int destId = Integer.parseInt(dest);
                                 Hand hand = MainApp.getRootController().getHand(destId);
-                                hand.add(card);
+                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getPlayedStack(), PlayedStack.getView(card),
+                                        hand.getContainer(), () -> {
+                                            PlayedStack.removeLastCard();
+                                            hand.add(card);
+                                        });
                             }
                         }
                     } else {
                         Hand hand = MainApp.getRootController().getHand(Integer.parseInt(from));
                         Card card = hand.getCard(update.get("card_id").getAsInt());
                         if(dest.equals("deck")) {
-                            Deck.put(card);
-                            hand.remove(card);
+                            double time = .3;
+                            MainApp.getRootController().animateMove(.3, hand.getContainer(), hand.getView(card),
+                                    MainApp.getRootController().getDeck(), () -> {
+                                        hand.remove(card);
+                                        Deck.put(card);
+                                    });
                         } else if (dest.equals("playedStack")) {
-                            PlayedStack.addCard(card);
-                            hand.remove(card);
+                            MainApp.getRootController().animateMove(.3, hand.getContainer(), hand.getView(card),
+                                    MainApp.getRootController().getPlayedStack(), () -> {
+                                        hand.remove(card);
+                                        PlayedStack.addCard(card);
+                                    });
                         } else {
                             int destId = Integer.parseInt(dest);
                             Hand target = MainApp.getRootController().getHand(destId);

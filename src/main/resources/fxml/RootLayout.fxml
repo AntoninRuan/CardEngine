@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.geometry.Point3D?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
-
 
 <Pane maxHeight="850.0" maxWidth="1383.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.antoninruan.mao.view.RootLayoutController">
    <children>
@@ -19,6 +21,15 @@
             </ImageView>
             <Pane fx:id="area">
                <children>
+                  <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" layoutX="538.0" layoutY="528.0" pannable="true" prefHeight="95.0" prefWidth="308.0" stylesheets="@../style/scrollpane.css" vbarPolicy="NEVER">
+                     <content>
+                        <HBox fx:id="cardHistory" spacing="5.0" style="-fx-background-color: #1d4719;">
+                           <padding>
+                              <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                           </padding>
+                        </HBox>
+                     </content>
+                  </ScrollPane>
                   <AnchorPane fx:id="hand" layoutX="374.0" layoutY="606.0" prefHeight="230.0" prefWidth="630.0" />
                   <StackPane fx:id="deck" layoutX="537.0" layoutY="335.0" prefHeight="180.0" prefWidth="128.0" style="-fx-border-color: #000; -fx-border-radius: 5px;" />
                   <StackPane fx:id="playedStack" layoutX="718.0" layoutY="335.0" prefHeight="180.0" prefWidth="128.0" style="-fx-border-color: #000; -fx-border-radius: 5px;" />

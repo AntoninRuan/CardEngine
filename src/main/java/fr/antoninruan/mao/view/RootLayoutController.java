@@ -1,24 +1,30 @@
 package fr.antoninruan.mao.view;
 
 import com.google.gson.JsonObject;
+import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.Card;
 import fr.antoninruan.mao.model.Deck;
 import fr.antoninruan.mao.model.Hand;
 import fr.antoninruan.mao.model.PlayedStack;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
+import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -35,6 +41,12 @@ public class RootLayoutController {
 
     @FXML
     private Pane area;
+
+    @FXML
+    private HBox cardHistory;
+
+    @FXML
+    private ScrollPane scrollPane;
 
     @FXML
     private StackPane deck;
@@ -56,11 +68,12 @@ public class RootLayoutController {
 
         addDeckCard(Deck.getSize());
 
+        scrollPane.hvalueProperty().bind(cardHistory.widthProperty());
+
         ownHand.setContainer(hand);
 
         deck.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.isAltDown() && mouseEvent.getButton() == MouseButton.MIDDLE) {
-//                System.out.println("shuffle");
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "shuffle");
                 RabbitMQManager.sendGameAction(object.toString());
@@ -91,20 +104,11 @@ public class RootLayoutController {
                 if(s[0].equals("hand")) {
                     object.addProperty("source", Integer.parseInt(s[1]));
                     object.addProperty("card_id", Integer.parseInt(s[2]));
-                    /*int handId = Integer.parseInt(s[1]);
-                    int cardId = Integer.parseInt(s[2]);
-                    Card card;
-                    if(handId == ownId) {
-                        card = ownHand.getCards().get(cardId);
-                        ownHand.remove(card);
-                    } else {
-                        card = others.get(handId).getCards().get(cardId);
-                        others.get(handId).remove(card);
-                    }
-                    Deck.put(card);*/
-                } else {
+                } else if (s[0].equals("playedStack")){
                     object.addProperty("source", "playedStack");
-                }
+                } else
+                    return;
+
                 object.addProperty("destination", "deck");
                 RabbitMQManager.sendGameAction(object.toString());
             }
@@ -137,9 +141,6 @@ public class RootLayoutController {
                 object.addProperty("type", "card_move");
                 if(s.equals("deck")) {
                     object.addProperty("source", "deck");
-                   /* Card card = Deck.draw();
-                    if (card != null)
-                        ownHand.add(card);*/
                 } else if (s.equals("playedStack")) {
                     object.addProperty("source", "playedStack");
 //                    ownHand.add(PlayedStack.pickLastCard());
@@ -186,17 +187,8 @@ public class RootLayoutController {
                 else if (s[0].equals("hand")) {
                     object.addProperty("source", Integer.parseInt(s[1]));
                     object.addProperty("card_id", Integer.parseInt(s[2]));
-                    /*int handId = Integer.parseInt(s[1]);
-                    int cardId = Integer.parseInt(s[2]);
-                    Card card;
-                    if(handId == ownId) {
-                        card = ownHand.getCards().get(cardId);
-                        ownHand.remove(card);
-                    } else {
-                        card = others.get(handId).getCards().get(cardId);
-                        others.get(handId).remove(card);
-                    }
-                    PlayedStack.addCard(card);*/
+                } else {
+                    return;
                 }
                 RabbitMQManager.sendGameAction(object.toString());
             }
@@ -273,7 +265,7 @@ public class RootLayoutController {
         }
     }
 
-    public ImageView addPlayedCard(Card card) {
+    public Pair<ImageView, ImageView> addPlayedCard(Card card) {
         ImageView view = new ImageView(card.getImage());
         view.setPreserveRatio(true);
         view.setFitHeight(150);
@@ -289,11 +281,19 @@ public class RootLayoutController {
         view.setTranslateY(translateY);
 
         playedStack.getChildren().add(view);
-        return view;
+        ImageView hist = new ImageView(card.getImage());
+        hist.setPreserveRatio(true);
+        hist.setFitHeight(69);
+        cardHistory.getChildren().add(hist);
+        return new Pair<>(view, hist);
     }
 
-    public void removePlayerCard(ImageView view) {
+    public void removePlayedCard(ImageView view) {
         playedStack.getChildren().remove(view);
+    }
+
+    public void removeCardHistory(ImageView view) {
+        cardHistory.getChildren().remove(view);
     }
 
     public Hand addPlayer(String name, int id) {
@@ -307,7 +307,6 @@ public class RootLayoutController {
         pane.setPrefHeight(161);
         area.getChildren().add(pane);
 
-//        name = "Joueur " + id;
         Label label = new Label(name);
         label.setLayoutX(0);
         label.setLayoutY(0);
@@ -334,10 +333,6 @@ public class RootLayoutController {
                 object.addProperty("destination", hand.getId());
                 if(s.equals("deck")) {
                     object.addProperty("source", "deck");
-                    /*Card card = Deck.draw();
-                    if (card != null) {
-                        hand.add(card);
-                    }*/
                 } else if (s.equals("playedStack")) {
                     object.addProperty("source", "playedStack");
 //                    hand.add(PlayedStack.pickLastCard());
@@ -346,8 +341,6 @@ public class RootLayoutController {
             }
         });
 
-//        usedIds.add(id);
-//        others.put(id, hand);
         hands.put(hand, pane);
 
         updateHands();
@@ -373,7 +366,7 @@ public class RootLayoutController {
     }
 
     private int rotate(int i, int size) {
-        return ((i - ownId) % size);
+        return Math.floorMod(i - ownId - 1, size + 1);
     }
 
     public void removePlayer(int id) {
@@ -385,8 +378,6 @@ public class RootLayoutController {
                 Deck.put(card);
             }
         }
-//        usedIds.remove((Integer) hand.getId());
-//        others.remove(hand.getId());
         area.getChildren().remove(hands.get(hand));
         hands.remove(hand);
         for (Hand h : hands.keySet().stream().filter(h -> h.getId() > id).collect(Collectors.toList())) {
@@ -415,7 +406,32 @@ public class RootLayoutController {
             return hands.keySet().stream().filter(h -> h.getId() == id).findFirst().get();
     }
 
+    public void animateMove(double time, Node container, ImageView card, Node dest, Runnable endTask) {
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.seconds(time));
+        Point2D point = container.parentToLocal(dest.getBoundsInParent().getCenterX(),
+                dest.getBoundsInParent().getCenterY());
+        transition.setByX(-card.getBoundsInParent().getCenterX() + point.getX());
+        transition.setByY(-card.getBoundsInParent().getCenterY()     + point.getY());
+        transition.setNode(card);
+        transition.play();
+        transition.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue.greaterThanOrEqualTo(Duration.seconds(time))) {
+                endTask.run();
+            }
+        });
+        transition.play();
+    }
+
     public StackPane getLayout() {
         return layout;
+    }
+
+    public StackPane getDeck() {
+        return deck;
+    }
+
+    public StackPane getPlayedStack() {
+        return playedStack;
     }
 }
