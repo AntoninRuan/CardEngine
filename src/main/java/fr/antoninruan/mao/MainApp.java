@@ -22,8 +22,15 @@ import java.util.Optional;
 
 public class MainApp extends Application {
 
+    // TODO trier ses cartes
+
     private static final double HEIGHT = 850;
     private static final double WIDTH = 1383;
+
+    public static final Media CARD_MOVE_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/card_move.mp3").toString());
+    public static final Media SHUFFLE_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/shuffle.mp3").toString());
+    public static final Media KNOCK_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/knock.mp3").toString());
+    public static final Media RUB_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/rub.mp3").toString());
 
     private static Pane rootLayout;
     private static RootLayoutController rootController;

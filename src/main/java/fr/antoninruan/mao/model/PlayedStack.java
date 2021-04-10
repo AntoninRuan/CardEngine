@@ -13,8 +13,8 @@ import java.util.List;
 
 public class PlayedStack {
 
-    private static HashMap<Card, Pair<ImageView, ImageView>> cards = new HashMap<>();
-    private static ObservableList<Card> keys = FXCollections.observableArrayList();
+    private static final HashMap<Card, Pair<ImageView, ImageView>> cards = new HashMap<>();
+    private static final ObservableList<Card> keys = FXCollections.observableArrayList();
 
     static {
 
@@ -51,12 +51,6 @@ public class PlayedStack {
 
     public static void addCard(Card card) {
         keys.add(card);
-    }
-
-    public static Card pickLastCard() {
-        Card card = keys.get(keys.size() - 1);
-        keys.remove(card);
-        return card;
     }
 
     public static ImageView getView(Card card) {

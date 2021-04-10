@@ -1,6 +1,5 @@
 package fr.antoninruan.mao.model;
 
-import fr.antoninruan.mao.MainApp;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -30,8 +29,8 @@ public class Hand {
 
     private Pane container;
 
-    private ObservableMap<Card, ImageView> cards = FXCollections.observableHashMap();
-    private ArrayList<Card> keys = new ArrayList<>();
+    private final ObservableMap<Card, ImageView> cards = FXCollections.observableHashMap();
+    private final ArrayList<Card> keys = new ArrayList<>();
 
     public Hand(int id, double baseX, double baseY, double baseRotate, double angleDelta, double length, boolean visible, int cardHeight) {
         this.id = id;
@@ -60,7 +59,7 @@ public class Hand {
         this.id = id;
     }
 
-    public ImageView add(Card card) {
+    public void add(Card card) {
         ImageView view = visible ? new ImageView(card.getImage()) : new ImageView(Deck.BLUEBACK);
         view.setPreserveRatio(true);
         view.setFitHeight(cardHeight);
@@ -87,10 +86,9 @@ public class Hand {
             container.getChildren().add(view);
         });
 
-        return view;
     }
 
-    public ImageView remove(Card card) {
+    public void remove(Card card) {
         ImageView view = cards.get(card);
         Platform.runLater(() -> {
             container.getChildren().remove(view);
@@ -98,15 +96,10 @@ public class Hand {
             cards.remove(card);
             updateHand();
         });
-        return view;
     }
 
     public Card getCard(int id) {
         return keys.get(id);
-    }
-
-    public int getCardId(Card card) {
-        return keys.indexOf(card);
     }
 
     public ArrayList<Card> getCards() {

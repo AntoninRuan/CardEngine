@@ -3,8 +3,6 @@ package fr.antoninruan.mao.model;
 import fr.antoninruan.mao.MainApp;
 import javafx.scene.image.Image;
 
-import java.util.Random;
-
 public class Card {
 
     public final static Card SPADE_AS = new Card(Suit.SPADE, Value.AS);
@@ -63,15 +61,9 @@ public class Card {
     public final static Card DIAMOND_QUEEN = new Card(Suit.DIAMOND, Value.QUEEN);
     public final static Card DIAMOND_KING = new Card(Suit.DIAMOND, Value.KING);
 
-    private Suit suit;
-    private Value value;
-    private Image image;
-
-    public static Card getRandomCard() {
-        Random random = new Random();
-        int s = random.nextInt(4), v = random.nextInt(13);
-        return new Card(Suit.fromInt(s), Value.fromInt(v));
-    }
+    private final Suit suit;
+    private final Value value;
+    private final Image image;
 
     public static Card getCard(Suit suit, Value value) {
         switch (suit) {
@@ -204,24 +196,8 @@ public class Card {
         this.image = new Image(MainApp.class.getClassLoader().getResource("card/" + suit.getId() + "-" + value.getId() + ".png").toString());
     }
 
-    public Suit getSuit() {
-        return suit;
-    }
-
-    public Value getValue() {
-        return value;
-    }
-
     public Image getImage() {
         return image;
-    }
-
-    public boolean is(Suit suit, Value value) {
-        return (this.suit == suit) && (this.value == value);
-    }
-
-    public boolean isFaceCard() {
-        return (this.value == Value.KING) || (this.value == Value.QUEEN) || (this.value == Value.JACK);
     }
 
     @Override
@@ -248,18 +224,6 @@ public class Card {
 
         public String getId() {
             return id;
-        }
-
-        private int getN() {
-            return n;
-        }
-
-        public static Suit fromInt(int i) {
-            for (Suit s : Suit.values()) {
-                if (i == s.getN())
-                    return s;
-            }
-            return SPADE;
         }
 
     }
@@ -289,18 +253,6 @@ public class Card {
 
         public String getId() {
             return id;
-        }
-
-        private int getN() {
-            return n;
-        }
-
-        public static Value fromInt(int i) {
-            for (Value s : Value.values()) {
-                if (i == s.getN())
-                    return s;
-            }
-            return AS;
         }
 
     }

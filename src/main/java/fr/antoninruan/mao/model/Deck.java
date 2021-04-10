@@ -12,16 +12,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 public class Deck {
 
     public static final Image BLUEBACK = new Image(MainApp.class.getClassLoader().getResource("card/Blueback.png").toString());
 
-    private static ObservableList<Card> deck = FXCollections.observableArrayList();
+    private static final ObservableList<Card> deck = FXCollections.observableArrayList();
 
     static {
         deck.addListener((ListChangeListener<? super Card>) change -> {
@@ -33,21 +28,6 @@ public class Deck {
             }
         });
     }
-
-/*    public static void init() {
-        for (Card.Suit s : Card.Suit.values()) {
-            for (Card.Value v : Card.Value.values()) {
-//                deck.add(new Card(s, v));
-            }
-        }
-    }
-
-    public static void shuffle() {
-        List<Card> d = Arrays.asList(deck.toArray(new Card[]{}));
-        Collections.shuffle(d);
-        deck.clear();
-        deck.addAll(d);
-    }*/
 
     public static ObservableList<Card> getDeck() {
         return deck;
@@ -61,7 +41,7 @@ public class Deck {
         if(deck.isEmpty())
             return null;
         ImageView view = (ImageView) MainApp.getRootController().getDeck().getChildren().get(MainApp.getRootController().getDeck().getChildren().size() - 1);
-        return new Pair<Card, ImageView>(deck.get(deck.size() - 1), view);
+        return new Pair<>(deck.get(deck.size() - 1), view);
     }
 
     public static void removeLast() {
@@ -69,15 +49,6 @@ public class Deck {
             return;
 
         deck.remove(deck.size() - 1);
-    }
-
-    public static Card draw() {
-        if (deck.isEmpty())
-            return null;
-
-        Card card = deck.get(deck.size() - 1);
-        deck.remove(deck.size() - 1);
-        return card;
     }
 
     public static void put(Card card) {

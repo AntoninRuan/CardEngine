@@ -9,12 +9,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
-import java.text.DecimalFormat;
 import java.util.Optional;
 
 public class DialogUtils {
-
-    private static final DecimalFormat decimalFormat = new DecimalFormat("00");
 
     public static Optional<ConnectionInfo> connect() {
         Dialog<ConnectionInfo> dialog = new Dialog<>();

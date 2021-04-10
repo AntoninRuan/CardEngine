@@ -1,7 +1,6 @@
 package fr.antoninruan.mao.view;
 
 import com.google.gson.JsonObject;
-import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.Card;
 import fr.antoninruan.mao.model.Deck;
 import fr.antoninruan.mao.model.Hand;

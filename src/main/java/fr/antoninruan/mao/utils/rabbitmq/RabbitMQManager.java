@@ -1,7 +1,5 @@
 package fr.antoninruan.mao.utils.rabbitmq;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rabbitmq.client.*;
@@ -10,14 +8,13 @@ import fr.antoninruan.mao.model.Card;
 import fr.antoninruan.mao.model.Deck;
 import fr.antoninruan.mao.model.Hand;
 import fr.antoninruan.mao.model.PlayedStack;
-import fr.antoninruan.mao.view.RootLayoutController;
 import javafx.application.Platform;
-import javafx.scene.media.Media;
+import javafx.scene.image.ImageView;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -192,17 +189,17 @@ public class RabbitMQManager {
                             hand.remove(card);
                         }
                     }
-                    Platform.runLater(new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/card_move.mp3").toString()))::play);
+                    Platform.runLater(new MediaPlayer(MainApp.CARD_MOVE_SOUND)::play);
                 } else if (type.equals("shuffle")) {
                     Deck.setFromJson(update.get("deck").getAsJsonArray());
-                    Platform.runLater(() -> new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/shuffle.mp3").toString())).play());
+                    Platform.runLater(new MediaPlayer(MainApp.SHUFFLE_SOUND)::play);
                 } else if(type.equals("rollback")) {
                     Deck.setFromJson(update.get("deck").getAsJsonArray());
                     PlayedStack.getCards().clear();
                 } else if(type.equals("knock")) {
-                    Platform.runLater(() -> new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/knock.mp3").toString())).play());
+                    Platform.runLater(new MediaPlayer(MainApp.KNOCK_SOUND)::play);
                 } else if(type.equals("rub")) {
-                    Platform.runLater(() -> new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/rub.mp3").toString())).play());
+                    Platform.runLater(new MediaPlayer(MainApp.RUB_SOUND)::play);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
