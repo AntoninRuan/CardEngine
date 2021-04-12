@@ -8,6 +8,7 @@ import fr.antoninruan.mao.model.PlayedStack;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -406,20 +407,28 @@ public class RootLayoutController {
     }
 
     public void animateMove(double time, Node container, ImageView card, Node dest, Runnable endTask) {
-        TranslateTransition transition = new TranslateTransition();
-        transition.setDuration(Duration.seconds(time));
-        Point2D point = container.parentToLocal(dest.getBoundsInParent().getCenterX(),
-                dest.getBoundsInParent().getCenterY());
-        transition.setByX(-card.getBoundsInParent().getCenterX() + point.getX());
-        transition.setByY(-card.getBoundsInParent().getCenterY()     + point.getY());
-        transition.setNode(card);
-        transition.play();
-        transition.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
-            if(newValue.greaterThanOrEqualTo(Duration.seconds(time))) {
-                endTask.run();
-            }
-        });
-        transition.play();
+        try {
+            TranslateTransition transition = new TranslateTransition();
+            transition.setDuration(Duration.seconds(time));
+            Point2D pointDest = container.parentToLocal(getCenter(dest.getBoundsInParent()));
+            Point2D pointFrom = getCenter(card.getBoundsInParent());
+            transition.setByX(-pointFrom.getX() + pointDest.getX());
+            transition.setByY(-pointFrom.getY() + pointDest.getY());
+            transition.setNode(card);
+            transition.play();
+            transition.currentTimeProperty().addListener((observable, oldValue, newValue) -> {
+                if(newValue.greaterThanOrEqualTo(Duration.seconds(time))) {
+                    endTask.run();
+                }
+            });
+            transition.play();
+        } catch (Exception | Error e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Point2D getCenter(Bounds bounds) {
+        return new Point2D((bounds.getMinX() + bounds.getMaxX()) * .5, (bounds.getMinY() + bounds.getMaxY()) * .5);
     }
 
     public StackPane getLayout() {

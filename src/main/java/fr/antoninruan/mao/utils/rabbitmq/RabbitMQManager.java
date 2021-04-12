@@ -170,7 +170,6 @@ public class RabbitMQManager {
                         Hand hand = MainApp.getRootController().getHand(Integer.parseInt(from));
                         Card card = hand.getCard(update.get("card_id").getAsInt());
                         if(dest.equals("deck")) {
-                            double time = .3;
                             MainApp.getRootController().animateMove(.3, hand.getContainer(), hand.getView(card),
                                     MainApp.getRootController().getDeck(), () -> {
                                         hand.remove(card);
