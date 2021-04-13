@@ -10,7 +10,7 @@ import fr.antoninruan.mao.model.Hand;
 import fr.antoninruan.mao.model.PlayedStack;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
-import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -188,17 +188,29 @@ public class RabbitMQManager {
                             hand.remove(card);
                         }
                     }
-                    Platform.runLater(new MediaPlayer(MainApp.CARD_MOVE_SOUND)::play);
+                    Platform.runLater(() -> {
+                        MainApp.CARD_MOVE_SOUND.seek(Duration.ZERO);
+                        MainApp.CARD_MOVE_SOUND.play();
+                    });
                 } else if (type.equals("shuffle")) {
                     Deck.setFromJson(update.get("deck").getAsJsonArray());
-                    Platform.runLater(new MediaPlayer(MainApp.SHUFFLE_SOUND)::play);
+                    Platform.runLater(() -> {
+                        MainApp.SHUFFLE_SOUND.seek(Duration.ZERO);
+                        MainApp.SHUFFLE_SOUND.play();
+                    });
                 } else if(type.equals("rollback")) {
                     Deck.setFromJson(update.get("deck").getAsJsonArray());
                     PlayedStack.getCards().clear();
                 } else if(type.equals("knock")) {
-                    Platform.runLater(new MediaPlayer(MainApp.KNOCK_SOUND)::play);
+                    Platform.runLater(() -> {
+                        MainApp.KNOCK_SOUND.seek(Duration.ZERO);
+                        MainApp.KNOCK_SOUND.play();
+                    });
                 } else if(type.equals("rub")) {
-                    Platform.runLater(new MediaPlayer(MainApp.RUB_SOUND)::play);
+                    Platform.runLater(() -> {
+                        MainApp.RUB_SOUND.seek(Duration.ZERO);
+                        MainApp.RUB_SOUND.play();
+                    });
                 }
             } catch (Exception e) {
                 e.printStackTrace();

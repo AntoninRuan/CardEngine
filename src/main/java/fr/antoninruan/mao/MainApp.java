@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.Precision;
 
@@ -28,10 +29,14 @@ public class MainApp extends Application {
     private static final double HEIGHT = 850;
     private static final double WIDTH = 1383;
 
-    public static final Media CARD_MOVE_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/card_move.mp3").toString());
-    public static final Media SHUFFLE_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/shuffle.mp3").toString());
-    public static final Media KNOCK_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/knock.mp3").toString());
-    public static final Media RUB_SOUND = new Media(MainApp.class.getClassLoader().getResource("sound/rub.mp3").toString());
+    public static final MediaPlayer CARD_MOVE_SOUND =
+            new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/card_move.mp3").toString()));
+    public static final MediaPlayer SHUFFLE_SOUND =
+            new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/shuffle.mp3").toString()));
+    public static final MediaPlayer KNOCK_SOUND =
+            new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/knock.mp3").toString()));
+    public static final MediaPlayer RUB_SOUND =
+            new MediaPlayer(new Media(MainApp.class.getClassLoader().getResource("sound/rub.mp3").toString()));
 
     private static Pane rootLayout;
     private static RootLayoutController rootController;
@@ -78,8 +83,6 @@ public class MainApp extends Application {
             }
             PlayedStack.getCards().setAll(playedStack);
             primaryStage.setTitle(info.getName());
-//            primaryStage.setFullScreen(true);
-//            System.out.println(info.getName());
             RabbitMQManager.listenGameUpdate();
         } else {
             primaryStage.close();
@@ -131,8 +134,7 @@ public class MainApp extends Application {
             rootController.getLayout().setLayoutX(offsetX);
             rootController.getLayout().setLayoutY(offsetY);
             rootLayout.setPrefWidth(WIDTH * scale - 1);
-            rootLayout.setPrefHeight(HEIGHT * scale - 1
-            );
+            rootLayout.setPrefHeight(HEIGHT * scale - 1);
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
@@ -145,10 +147,6 @@ public class MainApp extends Application {
 
     }
 
-    public static Pane getRootLayout() {
-        return rootLayout;
-    }
-
     public static RootLayoutController getRootController() {
         return rootController;
     }
@@ -157,26 +155,5 @@ public class MainApp extends Application {
         return primaryStage;
     }
 
-    public enum Scale {
-        FULL_SCALE("100 %", 100),
-        SCALE_3_4("75 %", 75),
-        SCALE_1_2("50 %", 50);
-
-        private String text;
-        private int scale;
-
-        Scale(String text, int scale) {
-            this.text = text;
-            this.scale = scale;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public int getScale() {
-            return scale;
-        }
-    }
 
 }
