@@ -5,9 +5,10 @@ import com.google.gson.JsonParser;
 import com.rabbitmq.client.*;
 import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.Card;
-import fr.antoninruan.mao.model.Deck;
-import fr.antoninruan.mao.model.Hand;
-import fr.antoninruan.mao.model.PlayedStack;
+import fr.antoninruan.mao.model.cardcontainer.Deck;
+import fr.antoninruan.mao.model.cardcontainer.Hand;
+import fr.antoninruan.mao.model.cardcontainer.PlayedStack;
+import fr.antoninruan.mao.utils.DialogUtils;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -123,8 +124,15 @@ public class RabbitMQManager {
                         Platform.runLater(() -> MainApp.getRootController().addPlayer(name, id));
                 } else if(type.equals("player_leave")) {
                     int leaveId = update.get("id").getAsInt();
-                    Platform.runLater(() -> MainApp.getRootController().removePlayer(leaveId));
-                    Deck.setFromJson(update.get("deck").getAsJsonArray());
+                    if(leaveId == MainApp.getRootController().getOwnId()) {
+                        Platform.runLater(() -> {
+                            DialogUtils.showKickDialog();
+                            System.exit(0);
+                        });
+                    } else {
+                        Platform.runLater(() -> MainApp.getRootController().removePlayer(leaveId));
+                        Deck.setFromJson(update.get("deck").getAsJsonArray());
+                    }
                 } else if (type.equals("card_move")) {
                     String dest = update.get("destination").getAsString();
                     String from = update.get("source").getAsString();

@@ -1,9 +1,10 @@
-package fr.antoninruan.mao.model;
+package fr.antoninruan.mao.model.cardcontainer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fr.antoninruan.mao.MainApp;
+import fr.antoninruan.mao.model.Card;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;

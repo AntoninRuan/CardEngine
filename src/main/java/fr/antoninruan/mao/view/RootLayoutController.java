@@ -2,11 +2,10 @@ package fr.antoninruan.mao.view;
 
 import com.google.gson.JsonObject;
 import fr.antoninruan.mao.model.Card;
-import fr.antoninruan.mao.model.Deck;
-import fr.antoninruan.mao.model.Hand;
-import fr.antoninruan.mao.model.PlayedStack;
+import fr.antoninruan.mao.model.cardcontainer.Deck;
+import fr.antoninruan.mao.model.cardcontainer.Hand;
+import fr.antoninruan.mao.model.cardcontainer.PlayedStack;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
-import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -24,7 +23,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -115,12 +113,12 @@ public class RootLayoutController {
         });
 
         hand.setOnMouseClicked(mouseEvent -> {
-            if(mouseEvent.isControlDown() && mouseEvent.getButton() == MouseButton.SECONDARY) {
+            if((mouseEvent.isControlDown() || mouseEvent.isMetaDown()) && mouseEvent.getButton() == MouseButton.SECONDARY) {
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "knock");
                 RabbitMQManager.sendGameAction(object.toString());
 //                System.out.println("knock");
-            } else if(mouseEvent.isAltDown() && mouseEvent.getButton() == MouseButton.PRIMARY) {
+            } else if((mouseEvent.isAltDown() || mouseEvent.isMetaDown()) && mouseEvent.getButton() == MouseButton.PRIMARY) {
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "rub");
                 RabbitMQManager.sendGameAction(object.toString());
@@ -408,7 +406,7 @@ public class RootLayoutController {
 
     public void animateMove(double time, Node container, ImageView card, Node dest, Runnable endTask) {
         try {
-            TranslateTransition transition = new TranslateTransition();
+            /*TranslateTransition transition = new TranslateTransition();
             transition.setDuration(Duration.seconds(time));
             Point2D pointDest = container.parentToLocal(getCenter(dest.getBoundsInParent()));
             Point2D pointFrom = getCenter(card.getBoundsInParent());
@@ -421,7 +419,8 @@ public class RootLayoutController {
                     endTask.run();
                 }
             });
-            transition.play();
+            transition.play();*/
+            endTask.run();
         } catch (Exception | Error e) {
             e.printStackTrace();
         }

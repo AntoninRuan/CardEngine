@@ -1,5 +1,7 @@
-package fr.antoninruan.mao.model;
+package fr.antoninruan.mao.model.cardcontainer;
 
+import fr.antoninruan.mao.model.Card;
+import fr.antoninruan.mao.model.cardcontainer.Deck;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -60,6 +62,7 @@ public class Hand {
     }
 
     public void add(Card card) {
+        keys.add(card);
         ImageView view = visible ? new ImageView(card.getImage()) : new ImageView(Deck.BLUEBACK);
         view.setPreserveRatio(true);
         view.setFitHeight(cardHeight);
