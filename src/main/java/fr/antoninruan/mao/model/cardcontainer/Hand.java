@@ -69,8 +69,6 @@ public class Hand extends CardContainer {
             });
         }
 
-
-        keys.add(card);
         cards.put(card, view);
 
         Platform.runLater(() -> {
