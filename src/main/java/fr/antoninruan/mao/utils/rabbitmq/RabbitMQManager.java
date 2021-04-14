@@ -181,7 +181,7 @@ public class RabbitMQManager {
                     });
                 } else if(type.equals("rollback")) {
                     MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
-                    MainApp.getPlayedStack().getCards().clear();
+                    MainApp.getPlayedStack().clear();
                 } else if(type.equals("knock")) {
                     Platform.runLater(() -> {
                         MainApp.KNOCK_SOUND.seek(Duration.ZERO);

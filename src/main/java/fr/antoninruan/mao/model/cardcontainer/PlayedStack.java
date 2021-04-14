@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PlayedStack extends CardContainer {
@@ -34,6 +35,12 @@ public class PlayedStack extends CardContainer {
             MainApp.getRootController().removePlayedCard(views.getKey());
             MainApp.getRootController().removeCardHistory(views.getValue());
         });
+    }
+
+    public void clear() {
+        for(Card c : new ArrayList<>(keys)) {
+            remove(c);
+        }
     }
 
     public Card getLastCard() {

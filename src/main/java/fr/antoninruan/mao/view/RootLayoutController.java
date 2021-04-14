@@ -133,8 +133,11 @@ public class RootLayoutController {
         });
 
         hand.setOnDragOver(event -> {
-            if(event.getDragboard().hasString())
-                event.acceptTransferModes(TransferMode.MOVE);
+            if(event.getDragboard().hasString()) {
+                String s = event.getDragboard().getString();
+                if(s.equals("deck") || s.equals("playedStack"))
+                    event.acceptTransferModes(TransferMode.MOVE);
+            }
             event.consume();
         });
 
