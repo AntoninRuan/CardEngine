@@ -29,7 +29,6 @@ import java.util.Optional;
 public class MainApp extends Application {
 
     // TODO trier ses cartes
-    // TODO ajouter auto updater
 
     private static final double HEIGHT = 850;
     private static final double WIDTH = 1383;
@@ -44,6 +43,8 @@ public class MainApp extends Application {
             new MediaPlayer(new Media(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("sound/rub.mp3")).toString()));
 
     private static RootLayoutController rootController;
+    private static Deck deck = new Deck();
+    private static PlayedStack playedStack = new PlayedStack();
 
     private static Stage primaryStage;
     public static final Image ICON = new Image(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("icon.png")).toString());
@@ -77,15 +78,14 @@ public class MainApp extends Application {
                     h.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
                 }
             }
-            Deck.setFromJson(response.get("deck").getAsJsonArray());
-            ArrayList<Card> playedStack = new ArrayList<>();
+            MainApp.getDeck().setFromJson(response.get("deck").getAsJsonArray());
+            playedStack.getCards().clear();
             for(JsonElement element : response.get("played_stack").getAsJsonArray()) {
                 JsonObject object = element.getAsJsonObject();
                 String suit = object.get("suit").getAsString();
                 String value = object.get("value").getAsString();
                 playedStack.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
-            PlayedStack.getCards().setAll(playedStack);
             primaryStage.setTitle(info.getName());
             RabbitMQManager.listenGameUpdate();
         } else {
@@ -137,6 +137,14 @@ public class MainApp extends Application {
 
     public static RootLayoutController getRootController() {
         return rootController;
+    }
+
+    public static Deck getDeck() {
+        return deck;
+    }
+
+    public static PlayedStack getPlayedStack() {
+        return playedStack;
     }
 
     public static Stage getPrimaryStage() {

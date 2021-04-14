@@ -1,11 +1,13 @@
 package fr.antoninruan.mao.view;
 
 import com.google.gson.JsonObject;
+import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.Card;
 import fr.antoninruan.mao.model.cardcontainer.Deck;
 import fr.antoninruan.mao.model.cardcontainer.Hand;
 import fr.antoninruan.mao.model.cardcontainer.PlayedStack;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
+import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
@@ -23,6 +25,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -64,11 +67,15 @@ public class RootLayoutController {
 
         initPosition();
 
-        addDeckCard(Deck.getSize());
+        addDeckCard(MainApp.getDeck().getSize());
 
         scrollPane.hvalueProperty().bind(cardHistory.widthProperty());
 
         ownHand.setContainer(hand);
+
+        MainApp.getPlayedStack().setContainer(playedStack);
+        MainApp.getDeck().setContainer(deck);
+
 
         deck.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.isAltDown() && mouseEvent.getButton() == MouseButton.MIDDLE) {
@@ -126,8 +133,11 @@ public class RootLayoutController {
         });
 
         hand.setOnDragOver(event -> {
-            if(event.getDragboard().hasString())
-                event.acceptTransferModes(TransferMode.MOVE);
+            if(event.getDragboard().hasString()) {
+                String s = event.getDragboard().getString();
+                if(s.equals("deck") || s.equals("playedStack"))
+                    event.acceptTransferModes(TransferMode.MOVE);
+            }
             event.consume();
         });
 
@@ -158,7 +168,7 @@ public class RootLayoutController {
         });
 
         playedStack.setOnDragDetected(event -> {
-            if(!PlayedStack.getCards().isEmpty()) {
+            if(!MainApp.getPlayedStack().getCards().isEmpty()) {
                 Dragboard dragboard = playedStack.startDragAndDrop(TransferMode.MOVE);
                 ClipboardContent content = new ClipboardContent();
                 content.putString("playedStack");
@@ -240,8 +250,10 @@ public class RootLayoutController {
     }
 
     public void removeDeckCard(int number) {
-        for (int i = 0; i < number; i ++)
-            deck.getChildren().remove(deck.getChildren().size() - 1);
+        for (int i = 0; i < number; i ++) {
+            if(deck.getChildren().size() > 0)
+                deck.getChildren().remove(deck.getChildren().size() - 1);
+        }
     }
 
     public void addDeckCard(int number) {
@@ -372,8 +384,7 @@ public class RootLayoutController {
 
         if(!hand.getCards().isEmpty()) {
             for(Card card : new ArrayList<>(hand.getCards())) {
-                hand.remove(card);
-                Deck.put(card);
+                hand.getCards().remove(card);
             }
         }
         area.getChildren().remove(hands.get(hand));
@@ -406,7 +417,7 @@ public class RootLayoutController {
 
     public void animateMove(double time, Node container, ImageView card, Node dest, Runnable endTask) {
         try {
-            /*TranslateTransition transition = new TranslateTransition();
+            TranslateTransition transition = new TranslateTransition();
             transition.setDuration(Duration.seconds(time));
             Point2D pointDest = container.parentToLocal(getCenter(dest.getBoundsInParent()));
             Point2D pointFrom = getCenter(card.getBoundsInParent());
@@ -419,8 +430,8 @@ public class RootLayoutController {
                     endTask.run();
                 }
             });
-            transition.play();*/
-            endTask.run();
+            transition.play();
+//            endTask.run();
         } catch (Exception | Error e) {
             e.printStackTrace();
         }
