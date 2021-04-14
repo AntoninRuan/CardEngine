@@ -247,8 +247,10 @@ public class RootLayoutController {
     }
 
     public void removeDeckCard(int number) {
-        for (int i = 0; i < number; i ++)
-            deck.getChildren().remove(deck.getChildren().size() - 1);
+        for (int i = 0; i < number; i ++) {
+            if(deck.getChildren().size() > 0)
+                deck.getChildren().remove(deck.getChildren().size() - 1);
+        }
     }
 
     public void addDeckCard(int number) {
@@ -379,8 +381,7 @@ public class RootLayoutController {
 
         if(!hand.getCards().isEmpty()) {
             for(Card card : new ArrayList<>(hand.getCards())) {
-                hand.remove(card);
-                MainApp.getDeck().add(card);
+                hand.getCards().remove(card);
             }
         }
         area.getChildren().remove(hands.get(hand));

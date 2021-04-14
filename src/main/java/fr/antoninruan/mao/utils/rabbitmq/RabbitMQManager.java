@@ -115,9 +115,7 @@ public class RabbitMQManager {
             try {
                 JsonObject update = JsonParser.parseString(new String(delivery.getBody(), StandardCharsets.UTF_8)).getAsJsonObject();
                 String type = update.get("type").getAsString();
-//                System.out.println("Receive: " + update.toString());
                 if(type.equals("new_player")) {
-//                    System.out.println("broadcast=" + update);
                     String name = update.get("name").getAsString();
                     int id = update.get("id").getAsInt();
                     if(update.get("id").getAsInt() != MainApp.getRootController().getOwnId())

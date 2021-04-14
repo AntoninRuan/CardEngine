@@ -79,14 +79,13 @@ public class MainApp extends Application {
                 }
             }
             MainApp.getDeck().setFromJson(response.get("deck").getAsJsonArray());
-            ArrayList<Card> playedStack = new ArrayList<>();
+            playedStack.getCards().clear();
             for(JsonElement element : response.get("played_stack").getAsJsonArray()) {
                 JsonObject object = element.getAsJsonObject();
                 String suit = object.get("suit").getAsString();
                 String value = object.get("value").getAsString();
                 playedStack.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
-            MainApp.getPlayedStack().getCards().setAll(playedStack);
             primaryStage.setTitle(info.getName());
             RabbitMQManager.listenGameUpdate();
         } else {
