@@ -131,69 +131,44 @@ public class RabbitMQManager {
                         });
                     } else {
                         Platform.runLater(() -> MainApp.getRootController().removePlayer(leaveId));
-                        Deck.setFromJson(update.get("deck").getAsJsonArray());
+                        MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
                     }
                 } else if (type.equals("card_move")) {
                     String dest = update.get("destination").getAsString();
                     String from = update.get("source").getAsString();
                     if(from.equals("deck")) {
-                        Pair<Card, ImageView> card = Deck.getLastCard();
+                        Card card = MainApp.getDeck().getLastCard();
                         if(card != null) {
                             if(dest.equals("playedStack")) {
-                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getDeck(), card.getValue(),
-                                        MainApp.getRootController().getPlayedStack(), () -> {
-                                            Deck.removeLast();
-                                            PlayedStack.addCard(card.getKey());
-                                        });
+                                MainApp.getDeck().moveCardTo(card, MainApp.getPlayedStack());
                             } else {
                                 int destId = Integer.parseInt(dest);
                                 Hand hand = MainApp.getRootController().getHand(destId);
-                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getDeck(), card.getValue(),
-                                        hand.getContainer(), () -> {
-                                            Deck.removeLast();
-                                            hand.add(card.getKey());
-                                        });
+                                MainApp.getDeck().moveCardTo(card, hand);
                             }
                         }
                     } else if (from.equals("playedStack")) {
-                        Card card = PlayedStack.getLastCard();
+                        Card card = MainApp.getPlayedStack().getLastCard();
                         if(card != null) {
                             if(dest.equals("deck")) {
-                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getPlayedStack(), PlayedStack.getView(card),
-                                        MainApp.getRootController().getDeck(), () -> {
-                                            PlayedStack.removeLastCard();
-                                            Deck.put(card);
-                                        });
+                                MainApp.getPlayedStack().moveCardTo(card, MainApp.getDeck());
                             } else {
                                 int destId = Integer.parseInt(dest);
                                 Hand hand = MainApp.getRootController().getHand(destId);
-                                MainApp.getRootController().animateMove(.3, MainApp.getRootController().getPlayedStack(), PlayedStack.getView(card),
-                                        hand.getContainer(), () -> {
-                                            PlayedStack.removeLastCard();
-                                            hand.add(card);
-                                        });
+                                MainApp.getPlayedStack().moveCardTo(card, hand);
                             }
                         }
                     } else {
                         Hand hand = MainApp.getRootController().getHand(Integer.parseInt(from));
                         Card card = hand.getCard(update.get("card_id").getAsInt());
                         if(dest.equals("deck")) {
-                            MainApp.getRootController().animateMove(.3, hand.getContainer(), hand.getView(card),
-                                    MainApp.getRootController().getDeck(), () -> {
-                                        hand.remove(card);
-                                        Deck.put(card);
-                                    });
+                            hand.moveCardTo(card, MainApp.getDeck());
                         } else if (dest.equals("playedStack")) {
-                            MainApp.getRootController().animateMove(.3, hand.getContainer(), hand.getView(card),
-                                    MainApp.getRootController().getPlayedStack(), () -> {
-                                        hand.remove(card);
-                                        PlayedStack.addCard(card);
-                                    });
+                            hand.moveCardTo(card, MainApp.getPlayedStack());
                         } else {
                             int destId = Integer.parseInt(dest);
                             Hand target = MainApp.getRootController().getHand(destId);
-                            target.add(card);
-                            hand.remove(card);
+                            hand.moveCardTo(card, target);
                         }
                     }
                     Platform.runLater(() -> {
@@ -201,14 +176,14 @@ public class RabbitMQManager {
                         MainApp.CARD_MOVE_SOUND.play();
                     });
                 } else if (type.equals("shuffle")) {
-                    Deck.setFromJson(update.get("deck").getAsJsonArray());
+                    MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
                     Platform.runLater(() -> {
                         MainApp.SHUFFLE_SOUND.seek(Duration.ZERO);
                         MainApp.SHUFFLE_SOUND.play();
                     });
                 } else if(type.equals("rollback")) {
-                    Deck.setFromJson(update.get("deck").getAsJsonArray());
-                    PlayedStack.getCards().clear();
+                    MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
+                    MainApp.getPlayedStack().getCards().clear();
                 } else if(type.equals("knock")) {
                     Platform.runLater(() -> {
                         MainApp.KNOCK_SOUND.seek(Duration.ZERO);

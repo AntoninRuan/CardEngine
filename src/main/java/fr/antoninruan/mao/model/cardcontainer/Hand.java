@@ -1,7 +1,7 @@
 package fr.antoninruan.mao.model.cardcontainer;
 
+import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.Card;
-import fr.antoninruan.mao.model.cardcontainer.Deck;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -10,12 +10,11 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-
-public class Hand {
+public class Hand extends CardContainer {
 
     private int id;
 
@@ -29,12 +28,11 @@ public class Hand {
 
     private final int cardHeight;
 
-    private Pane container;
-
     private final ObservableMap<Card, ImageView> cards = FXCollections.observableHashMap();
     private final ArrayList<Card> keys = new ArrayList<>();
 
     public Hand(int id, double baseX, double baseY, double baseRotate, double angleDelta, double length, boolean visible, int cardHeight) {
+        super(null);
         this.id = id;
         this.baseX = baseX;
         this.baseY = baseY;
@@ -43,14 +41,6 @@ public class Hand {
         this.length = length;
         this.visible = visible;
         this.cardHeight = cardHeight;
-    }
-
-    public Pane getContainer() {
-        return container;
-    }
-
-    public void setContainer(Pane container) {
-        this.container = container;
     }
 
     public int getId() {
@@ -62,7 +52,7 @@ public class Hand {
     }
 
     public void add(Card card) {
-        keys.add(card);
+        super.add(card);
         ImageView view = visible ? new ImageView(card.getImage()) : new ImageView(Deck.BLUEBACK);
         view.setPreserveRatio(true);
         view.setFitHeight(cardHeight);
@@ -92,21 +82,29 @@ public class Hand {
     }
 
     public void remove(Card card) {
+        super.remove(card);
         ImageView view = cards.get(card);
         Platform.runLater(() -> {
             container.getChildren().remove(view);
-            keys.remove(card);
             cards.remove(card);
             updateHand();
         });
     }
 
-    public Card getCard(int id) {
-        return keys.get(id);
+    @Override
+    public void moveCardTo(Card card, CardContainer dest) {
+        ImageView view = cards.get(card);
+        this.keys.remove(card);
+        this.cards.remove(card);
+        Platform.runLater(this::updateHand);
+        MainApp.getRootController().animateMove(.3, container, view, dest.container, () -> {
+            dest.add(card);
+            container.getChildren().remove(view);
+        });
     }
 
-    public ArrayList<Card> getCards() {
-        return keys;
+    public Card getCard(int id) {
+        return keys.get(id);
     }
 
     public ImageView getView(Card card) {
