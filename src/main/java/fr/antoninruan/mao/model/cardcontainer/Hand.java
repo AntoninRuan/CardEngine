@@ -12,6 +12,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Hand extends CardContainer {
@@ -29,7 +30,6 @@ public class Hand extends CardContainer {
     private final int cardHeight;
 
     private final ObservableMap<Card, ImageView> cards = FXCollections.observableHashMap();
-    private final ArrayList<Card> keys = new ArrayList<>();
 
     public Hand(int id, double baseX, double baseY, double baseRotate, double angleDelta, double length, boolean visible, int cardHeight) {
         super(null);
@@ -133,4 +133,25 @@ public class Hand extends CardContainer {
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Hand hand = (Hand) o;
+        return id == hand.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id);
+    }
+
+    @Override
+    public String toString() {
+        return "Hand{" +
+                "keys=" + Arrays.deepToString(keys.toArray()) +
+                ", id=" + id +
+                '}';
+    }
 }

@@ -1,17 +1,14 @@
 package fr.antoninruan.mao.model.cardcontainer;
 
 import fr.antoninruan.mao.model.Card;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public abstract class CardContainer {
 
-    protected final List<Card> keys = new ArrayList<>();
+    protected final ArrayList<Card> keys = new ArrayList<>();
 
     protected Pane container;
 
@@ -23,7 +20,7 @@ public abstract class CardContainer {
         this.container = container;
     }
 
-    public List<Card> getCards() {
+    public ArrayList<Card> getCards() {
         return keys;
     }
 
