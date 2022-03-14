@@ -63,7 +63,7 @@ public class Hand extends CardContainer {
                 if(event.getButton() == MouseButton.PRIMARY) {
                     Dragboard dragboard = view.startDragAndDrop(TransferMode.MOVE);
                     ClipboardContent content = new ClipboardContent();
-                    content.putString("hand" + "." + id + "." + keys.indexOf(card));
+                    content.putString("hand" + "." + id + "." + super.keys.indexOf(card));
                     dragboard.setContent(content);
                 }
             });
@@ -74,7 +74,7 @@ public class Hand extends CardContainer {
         Platform.runLater(() -> {
             updateHand();
 
-            container.getChildren().add(view);
+            super.container.getChildren().add(view);
         });
 
     }
@@ -83,7 +83,7 @@ public class Hand extends CardContainer {
         super.remove(card);
         ImageView view = cards.get(card);
         Platform.runLater(() -> {
-            container.getChildren().remove(view);
+            super.container.getChildren().remove(view);
             cards.remove(card);
             updateHand();
         });
@@ -92,17 +92,17 @@ public class Hand extends CardContainer {
     @Override
     public void moveCardTo(Card card, CardContainer dest) {
         ImageView view = cards.get(card);
-        this.keys.remove(card);
+        super.keys.remove(card);
         this.cards.remove(card);
         Platform.runLater(this::updateHand);
-        MainApp.getRootController().animateMove(.3, container, view, dest.container, () -> {
+        MainApp.getRootController().animateMove(.3, super.container, view, dest.container, () -> {
             dest.add(card);
-            container.getChildren().remove(view);
+            super.container.getChildren().remove(view);
         });
     }
 
     public Card getCard(int id) {
-        return keys.get(id);
+        return super.keys.get(id);
     }
 
     public ImageView getView(Card card) {
@@ -119,8 +119,8 @@ public class Hand extends CardContainer {
         double rotateIncrement = (cards.size() - 1) == 0 ? 0 : angleDelta / ((double) cards.size() - 1);
 
 
-        for(int i = 0; i < keys.size(); i ++) {
-            ImageView cView = cards.get(keys.get(i));
+        for(int i = 0; i < super.keys.size(); i ++) {
+            ImageView cView = cards.get(super.keys.get(i));
             double rotate = baseRotate - (angleDelta / 2.) + i * rotateIncrement;
             cView.setRotate(rotate);
             cView.setLayoutX(baseX + length * Math.sin((rotate * 2 * Math.PI) / 360));
@@ -148,7 +148,7 @@ public class Hand extends CardContainer {
     @Override
     public String toString() {
         return "Hand{" +
-                "keys=" + Arrays.deepToString(keys.toArray()) +
+                "keys=" + Arrays.deepToString(super.keys.toArray()) +
                 ", id=" + id +
                 '}';
     }

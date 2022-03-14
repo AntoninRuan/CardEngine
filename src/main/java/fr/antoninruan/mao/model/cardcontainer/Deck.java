@@ -6,11 +6,8 @@ import com.google.gson.JsonObject;
 import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.Card;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.Pair;
 
 public class Deck extends CardContainer implements Stack {
 

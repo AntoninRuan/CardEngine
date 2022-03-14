@@ -3,7 +3,8 @@ package fr.antoninruan.mao;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import fr.antoninruan.mao.model.*;
+import fr.antoninruan.mao.model.Card;
+import fr.antoninruan.mao.model.ConnectionInfo;
 import fr.antoninruan.mao.model.cardcontainer.Deck;
 import fr.antoninruan.mao.model.cardcontainer.Hand;
 import fr.antoninruan.mao.model.cardcontainer.PlayedStack;
@@ -22,7 +23,6 @@ import javafx.stage.Stage;
 import org.apache.commons.math3.util.Precision;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -64,13 +64,11 @@ public class MainApp extends Application {
         if (connectionInfo.isPresent()) {
             ConnectionInfo info = connectionInfo.get();
             initRootLayout(Precision.round(info.getScale(), 2));
-            RabbitMQManager.init(info.getHost(), 5672, "card_engine", "zHaBdgLr388");
+            RabbitMQManager.init(info.getHost(), 5672, "card_engine", "pgN4KRTrc74");
             JsonObject response = JsonParser.parseString(RabbitMQManager.connect(info.getName())).getAsJsonObject();
             rootController.setOwnId(response.get("id").getAsInt());
-//            System.out.println("response=" + response);
             for (JsonElement element : response.get("players").getAsJsonArray()) {
                 JsonObject p = element.getAsJsonObject();
-//                System.out.println("Player=" + p.toString());
                 Hand h = rootController.addPlayer(p.get("name").getAsString(), p.get("id").getAsInt());
                 for(JsonElement card : p.get("cards").getAsJsonArray()) {
                     String suit = card.getAsJsonObject().get("suit").getAsString();
@@ -86,7 +84,7 @@ public class MainApp extends Application {
                 String value = object.get("value").getAsString();
                 playedStack.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
-            primaryStage.setTitle(info.getName());
+            primaryStage.setTitle(info.getHost() + " - " + info.getName());
             RabbitMQManager.listenGameUpdate();
         } else {
             primaryStage.close();

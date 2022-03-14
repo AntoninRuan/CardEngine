@@ -361,7 +361,10 @@ public class RootLayoutController {
         List<Point2D> positions = this.positions.get(hands.size() - 1);
         double angle = 360. / (double) (hands.size() + 1);
         int j = 0;
-        List<Pair<Integer, Hand>> sortedHandId = hands.keySet().stream().map(h -> new Pair<>(h.getId(), h)).sorted(Comparator.comparingInt(o -> rotate(o.getKey(), hands.size()))).collect(Collectors.toList());
+        List<Pair<Integer, Hand>> sortedHandId = hands.keySet().stream()
+                .map(h -> new Pair<>(h.getId(), h))
+                .sorted(Comparator.comparingInt(o -> rotate(o.getKey(), hands.size())))
+                .collect(Collectors.toList());
         for(Pair<Integer, Hand> pair : sortedHandId) {
             Hand hand = pair.getValue();
             Pane pane = hands.get(hand);
