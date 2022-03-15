@@ -5,14 +5,10 @@ import com.google.gson.JsonParser;
 import com.rabbitmq.client.*;
 import fr.antoninruan.mao.MainApp;
 import fr.antoninruan.mao.model.Card;
-import fr.antoninruan.mao.model.cardcontainer.Deck;
 import fr.antoninruan.mao.model.cardcontainer.Hand;
-import fr.antoninruan.mao.model.cardcontainer.PlayedStack;
 import fr.antoninruan.mao.utils.DialogUtils;
 import javafx.application.Platform;
-import javafx.scene.image.ImageView;
 import javafx.util.Duration;
-import javafx.util.Pair;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -115,83 +111,95 @@ public class RabbitMQManager {
             try {
                 JsonObject update = JsonParser.parseString(new String(delivery.getBody(), StandardCharsets.UTF_8)).getAsJsonObject();
                 String type = update.get("type").getAsString();
-                if(type.equals("new_player")) {
-                    String name = update.get("name").getAsString();
-                    int id = update.get("id").getAsInt();
-                    if(update.get("id").getAsInt() != MainApp.getRootController().getOwnId())
-                        Platform.runLater(() -> MainApp.getRootController().addPlayer(name, id));
-                } else if(type.equals("player_leave")) {
-                    int leaveId = update.get("id").getAsInt();
-                    if(leaveId == MainApp.getRootController().getOwnId()) {
-                        Platform.runLater(() -> {
-                            DialogUtils.showKickDialog();
-                            System.exit(0);
-                        });
-                    } else {
-                        Platform.runLater(() -> MainApp.getRootController().removePlayer(leaveId));
-                        MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
-                    }
-                } else if (type.equals("card_move")) {
-                    String dest = update.get("destination").getAsString();
-                    String from = update.get("source").getAsString();
-                    if(from.equals("deck")) {
-                        Card card = MainApp.getDeck().getLastCard();
-                        if(card != null) {
-                            if(dest.equals("playedStack")) {
-                                MainApp.getDeck().moveCardTo(card, MainApp.getPlayedStack());
-                            } else {
-                                int destId = Integer.parseInt(dest);
-                                Hand hand = MainApp.getRootController().getHand(destId);
-                                MainApp.getDeck().moveCardTo(card, hand);
-                            }
-                        }
-                    } else if (from.equals("playedStack")) {
-                        Card card = MainApp.getPlayedStack().getLastCard();
-                        if(card != null) {
-                            if(dest.equals("deck")) {
-                                MainApp.getPlayedStack().moveCardTo(card, MainApp.getDeck());
-                            } else {
-                                int destId = Integer.parseInt(dest);
-                                Hand hand = MainApp.getRootController().getHand(destId);
-                                MainApp.getPlayedStack().moveCardTo(card, hand);
-                            }
-                        }
-                    } else {
-                        Hand hand = MainApp.getRootController().getHand(Integer.parseInt(from));
-                        Card card = hand.getCard(update.get("card_id").getAsInt());
-                        if(dest.equals("deck")) {
-                            hand.moveCardTo(card, MainApp.getDeck());
-                        } else if (dest.equals("playedStack")) {
-                            hand.moveCardTo(card, MainApp.getPlayedStack());
+                switch (type) {
+                    case "new_player":
+                        String name = update.get("name").getAsString();
+                        int id = update.get("id").getAsInt();
+                        if (update.get("id").getAsInt() != MainApp.getRootController().getOwnId())
+                            Platform.runLater(() -> MainApp.getRootController().addPlayer(name, id));
+                        break;
+                    case "player_leave":
+                        int leaveId = update.get("id").getAsInt();
+                        if (leaveId == MainApp.getRootController().getOwnId()) {
+                            Platform.runLater(() -> {
+                                DialogUtils.showKickDialog();
+                                System.exit(0);
+                            });
                         } else {
-                            int destId = Integer.parseInt(dest);
-                            Hand target = MainApp.getRootController().getHand(destId);
-                            hand.moveCardTo(card, target);
+                            Platform.runLater(() -> MainApp.getRootController().removePlayer(leaveId));
+                            MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
                         }
-                    }
-                    Platform.runLater(() -> {
-                        MainApp.CARD_MOVE_SOUND.seek(Duration.ZERO);
-                        MainApp.CARD_MOVE_SOUND.play();
-                    });
-                } else if (type.equals("shuffle")) {
-                    MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
-                    Platform.runLater(() -> {
-                        MainApp.SHUFFLE_SOUND.seek(Duration.ZERO);
-                        MainApp.SHUFFLE_SOUND.play();
-                    });
-                } else if(type.equals("rollback")) {
-                    MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
-                    MainApp.getPlayedStack().clear();
-                } else if(type.equals("knock")) {
-                    Platform.runLater(() -> {
-                        MainApp.KNOCK_SOUND.seek(Duration.ZERO);
-                        MainApp.KNOCK_SOUND.play();
-                    });
-                } else if(type.equals("rub")) {
-                    Platform.runLater(() -> {
-                        MainApp.RUB_SOUND.seek(Duration.ZERO);
-                        MainApp.RUB_SOUND.play();
-                    });
+                        break;
+                    case "card_move":
+                        String dest = update.get("destination").getAsString();
+                        String from = update.get("source").getAsString();
+                        JsonObject cardJson = update.get("moved_card").getAsJsonObject();
+                        Card.Suit suit = Card.Suit.valueOf(cardJson.get("suit").getAsString());
+                        Card.Value value = Card.Value.valueOf(cardJson.get("value").getAsString());
+                        Card card = Card.getCard(suit, value);
+                        if (from.equals("deck")) {
+//                            Card card = MainApp.getDeck().getLastCard();
+                            if (card != null) {
+                                if (dest.equals("playedStack")) {
+                                    MainApp.getDeck().moveCardTo(card, MainApp.getPlayedStack());
+                                } else {
+                                    int destId = Integer.parseInt(dest);
+                                    Hand hand = MainApp.getRootController().getHand(destId);
+                                    MainApp.getDeck().moveCardTo(card, hand);
+                                }
+                            }
+                        } else if (from.equals("playedStack")) {
+//                            Card card = MainApp.getPlayedStack().getLastCard();
+                            if (card != null) {
+                                if (dest.equals("deck")) {
+                                    MainApp.getPlayedStack().moveCardTo(card, MainApp.getDeck());
+                                } else {
+                                    int destId = Integer.parseInt(dest);
+                                    Hand hand = MainApp.getRootController().getHand(destId);
+                                    MainApp.getPlayedStack().moveCardTo(card, hand);
+                                }
+                            }
+                        } else {
+                            Hand hand = MainApp.getRootController().getHand(Integer.parseInt(from));
+//                            Card card = hand.getCard(update.get("card_id").getAsInt());
+                            if (dest.equals("deck")) {
+                                hand.moveCardTo(card, MainApp.getDeck());
+                            } else if (dest.equals("playedStack")) {
+                                hand.moveCardTo(card, MainApp.getPlayedStack());
+                            } else {
+                                int destId = Integer.parseInt(dest);
+                                Hand target = MainApp.getRootController().getHand(destId);
+                                hand.moveCardTo(card, target);
+                            }
+                        }
+                        Platform.runLater(() -> {
+                            MainApp.CARD_MOVE_SOUND.seek(Duration.ZERO);
+                            MainApp.CARD_MOVE_SOUND.play();
+                        });
+                        break;
+                    case "shuffle":
+                        MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
+                        Platform.runLater(() -> {
+                            MainApp.SHUFFLE_SOUND.seek(Duration.ZERO);
+                            MainApp.SHUFFLE_SOUND.play();
+                        });
+                        break;
+                    case "rollback":
+                        MainApp.getDeck().setFromJson(update.get("deck").getAsJsonArray());
+                        MainApp.getPlayedStack().clear();
+                        break;
+                    case "knock":
+                        Platform.runLater(() -> {
+                            MainApp.KNOCK_SOUND.seek(Duration.ZERO);
+                            MainApp.KNOCK_SOUND.play();
+                        });
+                        break;
+                    case "rub":
+                        Platform.runLater(() -> {
+                            MainApp.RUB_SOUND.seek(Duration.ZERO);
+                            MainApp.RUB_SOUND.play();
+                        });
+                        break;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
