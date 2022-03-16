@@ -120,6 +120,8 @@ public class RootLayoutController {
         });
 
         hand.setOnMouseClicked(mouseEvent -> {
+            System.out.println(mouseEvent.getButton());
+            System.out.println(mouseEvent.isAltDown());
             if((mouseEvent.isControlDown() || mouseEvent.isMetaDown()) && mouseEvent.getButton() == MouseButton.SECONDARY) {
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "knock");

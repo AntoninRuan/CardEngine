@@ -25,7 +25,7 @@ import java.util.TimerTask;
 
 public class DialogUtils {
 
-    public static Optional<ConnectionInfo> connect() {
+    public static Optional<ConnectionInfo> connect(int preselectScale) {
         Dialog<ConnectionInfo> dialog = new Dialog<>();
 
         dialog.setTitle("Connexion");
@@ -60,7 +60,7 @@ public class DialogUtils {
                 return Integer.parseInt(s.split(" ")[0]);
             }
         });
-        scale.getSelectionModel().select((Integer) 75);
+        scale.getSelectionModel().select((Integer) preselectScale);
 
         gridPane.add(new Label("Serveur"), 0, 0);
         gridPane.add(host, 1, 0);

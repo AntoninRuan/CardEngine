@@ -14,11 +14,13 @@ import fr.antoninruan.mao.view.RootLayoutController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.Precision;
 
@@ -60,7 +62,9 @@ public class MainApp extends Application {
             Platform.exit();
         });
 
-        Optional<ConnectionInfo> connectionInfo = DialogUtils.connect();
+        int preselectScale = preselectScale();
+
+        Optional<ConnectionInfo> connectionInfo = DialogUtils.connect(preselectScale);
         if (connectionInfo.isPresent()) {
             ConnectionInfo info = connectionInfo.get();
             initRootLayout(Precision.round(info.getScale(), 2));
@@ -90,6 +94,17 @@ public class MainApp extends Application {
             primaryStage.close();
         }
 
+    }
+
+    private int preselectScale() {
+        Rectangle2D screen = Screen.getPrimary().getBounds();
+        int defaultScale = 75;
+        if(screen.getWidth() >= 1400 && screen.getHeight() >= 900)
+            defaultScale = 100;
+        else if (screen.getWidth() < 975 || screen.getHeight() < 600)
+            defaultScale = 50;
+
+        return defaultScale;
     }
 
     private void initRootLayout(double scale) {
