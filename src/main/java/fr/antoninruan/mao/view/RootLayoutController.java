@@ -120,13 +120,10 @@ public class RootLayoutController {
         });
 
         hand.setOnMouseClicked(mouseEvent -> {
-            System.out.println(mouseEvent.getButton());
-            System.out.println(mouseEvent.isAltDown());
             if((mouseEvent.isControlDown() || mouseEvent.isMetaDown()) && mouseEvent.getButton() == MouseButton.SECONDARY) {
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "knock");
                 RabbitMQManager.sendGameAction(object.toString());
-//                System.out.println("knock");
             } else if((mouseEvent.isAltDown() || mouseEvent.isMetaDown()) && mouseEvent.getButton() == MouseButton.PRIMARY) {
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "rub");
@@ -162,7 +159,6 @@ public class RootLayoutController {
 
         playedStack.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.isAltDown() && mouseEvent.getButton() == MouseButton.MIDDLE) {
-//                System.out.println("Rollback");
                 JsonObject object = new JsonObject();
                 object.addProperty("type", "rollback");
                 RabbitMQManager.sendGameAction(object.toString());
