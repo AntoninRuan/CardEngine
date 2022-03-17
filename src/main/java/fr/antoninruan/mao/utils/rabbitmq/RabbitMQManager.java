@@ -21,6 +21,8 @@ public class RabbitMQManager {
 
     private static final String EXCHANGE_GAME_UPDATES = "game_updates";
     private static final String QUEUE_GAME_ACTION = "game_actions";
+    private static final String EXCHANGE_CHAT_UPDATE = "chat_update";
+    private static final String QUEUE_MESSAGE_SENDING = "message_sending";
     private static final String RPC_QUEUE_CONNECTION = "connection_queue";
 
     private static Channel channel;
@@ -38,12 +40,12 @@ public class RabbitMQManager {
             connection = factory.newConnection();
             channel = connection.createChannel();
             channel.addShutdownListener(e -> {
-                if(!e.getMessage().contains("clean channel shutdown")) {
+                if (!e.getMessage().contains("clean channel shutdown"))
                     e.printStackTrace();
-                }
             });
             channel.exchangeDeclare(EXCHANGE_GAME_UPDATES, "fanout");
             channel.queueDeclare(QUEUE_GAME_ACTION, true, false, false, null);
+            channel.exchangeDeclare(EXCHANGE_CHAT_UPDATE, "fanout");
 
         } catch (TimeoutException | IOException e) {
             e.printStackTrace();
@@ -98,6 +100,17 @@ public class RabbitMQManager {
     public static void sendGameAction(String action) {
         try {
             channel.basicPublish("", QUEUE_GAME_ACTION, MessageProperties.PERSISTENT_TEXT_PLAIN, action.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void sendChatMessage(String user, String message) {
+        JsonObject object = new JsonObject();
+        object.addProperty("user", user);
+        object.addProperty("content", message);
+        try {
+            channel.basicPublish("", QUEUE_MESSAGE_SENDING, MessageProperties.PERSISTENT_TEXT_PLAIN, object.toString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -206,8 +219,26 @@ public class RabbitMQManager {
             }
         };
 
-        channel.basicConsume(queue, true, deliverCallback, consumerTag -> {});
+        channel.basicConsume(queue, true, deliverCallback, consumerTag -> {
+        });
     }
 
+    public static void listenChatUpdate() throws IOException {
+        String queue = channel.queueDeclare().getQueue();
+        channel.queueBind(queue, EXCHANGE_CHAT_UPDATE, "");
+
+        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+            try {
+                JsonObject object = JsonParser.parseString(new String(delivery.getBody(), StandardCharsets.UTF_8)).getAsJsonObject();
+                if (MainApp.getChatController() != null)
+                    Platform.runLater(() -> MainApp.getChatController().addMessage(object.get("user").getAsString(), object.get("content").getAsString()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        channel.basicConsume(queue, true, deliverCallback, consumerTag -> {
+        });
+    }
 
 }

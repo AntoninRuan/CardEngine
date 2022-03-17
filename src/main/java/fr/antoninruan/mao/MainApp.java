@@ -10,6 +10,7 @@ import fr.antoninruan.mao.model.cardcontainer.Hand;
 import fr.antoninruan.mao.model.cardcontainer.PlayedStack;
 import fr.antoninruan.mao.utils.DialogUtils;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
+import fr.antoninruan.mao.view.ChatLayoutController;
 import fr.antoninruan.mao.view.RootLayoutController;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -17,9 +18,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.commons.math3.util.Precision;
@@ -31,6 +34,8 @@ import java.util.Optional;
 public class MainApp extends Application {
 
     // TODO trier ses cartes
+    // TODO ajoute réglage volume sonore
+    // TODO tchat
 
     private static final double HEIGHT = 850;
     private static final double WIDTH = 1383;
@@ -45,8 +50,13 @@ public class MainApp extends Application {
             new MediaPlayer(new Media(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("sound/rub.mp3")).toString()));
 
     private static RootLayoutController rootController;
+    private static ChatLayoutController chatController;
     private static Deck deck = new Deck();
     private static PlayedStack playedStack = new PlayedStack();
+    private static String username;
+
+    private static Stage chatStage;
+    private static boolean chatOpen = false;
 
     private static Stage primaryStage;
     public static final Image ICON = new Image(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("icon.png")).toString());
@@ -70,6 +80,7 @@ public class MainApp extends Application {
             initRootLayout(Precision.round(info.getScale(), 2));
             RabbitMQManager.init(info.getHost(), 5672, "card_engine", "pgN4KRTrc74");
             JsonObject response = JsonParser.parseString(RabbitMQManager.connect(info.getName())).getAsJsonObject();
+            username = info.getName();
             rootController.setOwnId(response.get("id").getAsInt());
             for (JsonElement element : response.get("players").getAsJsonArray()) {
                 JsonObject p = element.getAsJsonObject();
@@ -88,8 +99,9 @@ public class MainApp extends Application {
                 String value = object.get("value").getAsString();
                 playedStack.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
-            primaryStage.setTitle(info.getHost() + " - " + info.getName());
+            primaryStage.setTitle(info.getHost() + " - " + username);
             RabbitMQManager.listenGameUpdate();
+            RabbitMQManager.listenChatUpdate();
         } else {
             primaryStage.close();
         }
@@ -97,7 +109,7 @@ public class MainApp extends Application {
     }
 
     private int preselectScale() {
-        Rectangle2D screen = Screen.getPrimary().getBounds();
+        Rectangle2D screen = Screen.getPrimary().getVisualBounds();
         int defaultScale = 75;
         if(screen.getWidth() >= 1400 && screen.getHeight() >= 900)
             defaultScale = 100;
@@ -148,8 +160,52 @@ public class MainApp extends Application {
 
     }
 
+    public static void toggleChat() {
+        if (chatOpen) {
+            chatStage.close();
+            chatStage = null;
+            chatOpen = false;
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getClassLoader().getResource("fxml/ChatLayout.fxml"));
+
+            AnchorPane pane = loader.load();
+
+            chatController = loader.getController();
+
+            Scene scene = new Scene(pane);
+            chatStage = new Stage();
+            chatStage.setScene(scene);
+            chatStage.initModality(Modality.NONE);
+            chatStage.initOwner(primaryStage);
+            chatStage.setX(primaryStage.getX() + primaryStage.getWidth() + 30);
+            chatStage.setY(primaryStage.getY());
+            chatStage.setTitle("Chat");
+            chatStage.setOnCloseRequest(windowEvent -> {
+                chatOpen = false;
+                chatStage.close();
+                windowEvent.consume();
+            });
+            chatOpen = true;
+            chatStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getUsername() {
+        return username;
+    }
+
     public static RootLayoutController getRootController() {
         return rootController;
+    }
+
+    public static ChatLayoutController getChatController() {
+        return chatController;
     }
 
     public static Deck getDeck() {

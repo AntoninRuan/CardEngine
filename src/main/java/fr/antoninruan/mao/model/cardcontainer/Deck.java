@@ -9,7 +9,7 @@ import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class Deck extends CardContainer implements Stack {
+public class Deck extends CardContainer {
 
     public static final Image BLUEBACK = new Image(MainApp.class.getClassLoader().getResource("card/Blueback.png").toString());
 
