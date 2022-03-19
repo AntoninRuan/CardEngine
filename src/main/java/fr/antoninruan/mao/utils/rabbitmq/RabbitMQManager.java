@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rabbitmq.client.*;
 import fr.antoninruan.mao.MainApp;
-import fr.antoninruan.mao.model.Card;
-import fr.antoninruan.mao.model.cardcontainer.Hand;
+import fr.antoninruan.mao.model.card.Card;
+import fr.antoninruan.mao.model.card.cardcontainer.Hand;
 import fr.antoninruan.mao.utils.DialogUtils;
 import javafx.application.Platform;
 import javafx.util.Duration;
@@ -105,10 +105,11 @@ public class RabbitMQManager {
         }
     }
 
-    public static void sendChatMessage(String user, String message) {
+    public static void sendChatMessage(String user, String message, String emote) {
         JsonObject object = new JsonObject();
         object.addProperty("user", user);
         object.addProperty("content", message);
+        object.addProperty("emote", emote);
         try {
             channel.basicPublish("", QUEUE_MESSAGE_SENDING, MessageProperties.PERSISTENT_TEXT_PLAIN, object.toString().getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
@@ -231,7 +232,9 @@ public class RabbitMQManager {
             try {
                 JsonObject object = JsonParser.parseString(new String(delivery.getBody(), StandardCharsets.UTF_8)).getAsJsonObject();
                 if (MainApp.getChatController() != null)
-                    Platform.runLater(() -> MainApp.getChatController().addMessage(object.get("user").getAsString(), object.get("content").getAsString()));
+                    Platform.runLater(() -> MainApp.getChatController().addMessage(object.get("user").getAsString(),
+                            object.get("content").getAsString(),
+                            object.get("emote").getAsString()));
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,4 @@
-package fr.antoninruan.mao.utils.chat;
+package fr.antoninruan.mao.model.chat;
 
 import java.util.ArrayList;
 import java.util.List;

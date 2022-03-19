@@ -1,7 +1,7 @@
-package fr.antoninruan.mao.model.cardcontainer;
+package fr.antoninruan.mao.model.card.cardcontainer;
 
 import fr.antoninruan.mao.MainApp;
-import fr.antoninruan.mao.model.Card;
+import fr.antoninruan.mao.model.card.Card;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -11,7 +11,6 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 

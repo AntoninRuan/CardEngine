@@ -1,4 +1,4 @@
-package fr.antoninruan.mao.model;
+package fr.antoninruan.mao.model.card;
 
 import fr.antoninruan.mao.MainApp;
 import javafx.scene.image.Image;

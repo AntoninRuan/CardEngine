@@ -1,13 +1,15 @@
 package fr.antoninruan.mao;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import fr.antoninruan.mao.model.Card;
 import fr.antoninruan.mao.model.ConnectionInfo;
-import fr.antoninruan.mao.model.cardcontainer.Deck;
-import fr.antoninruan.mao.model.cardcontainer.Hand;
-import fr.antoninruan.mao.model.cardcontainer.PlayedStack;
+import fr.antoninruan.mao.model.card.Card;
+import fr.antoninruan.mao.model.card.cardcontainer.Deck;
+import fr.antoninruan.mao.model.card.cardcontainer.Hand;
+import fr.antoninruan.mao.model.card.cardcontainer.PlayedStack;
+import fr.antoninruan.mao.model.chat.Emote;
 import fr.antoninruan.mao.utils.DialogUtils;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
 import fr.antoninruan.mao.view.ChatLayoutController;
@@ -17,6 +19,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -25,9 +29,11 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import org.apache.commons.math3.util.Precision;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -35,7 +41,7 @@ public class MainApp extends Application {
 
     // TODO trier ses cartes
     // TODO ajoute réglage volume sonore
-    // TODO tchat
+    // TODO chat
 
     private static final double HEIGHT = 850;
     private static final double WIDTH = 1383;
@@ -48,12 +54,14 @@ public class MainApp extends Application {
             new MediaPlayer(new Media(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("sound/knock.mp3")).toString()));
     public static final MediaPlayer RUB_SOUND =
             new MediaPlayer(new Media(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("sound/rub.mp3")).toString()));
+    private static final File rootFolder = new File("");
 
     private static RootLayoutController rootController;
     private static ChatLayoutController chatController;
-    private static Deck deck = new Deck();
-    private static PlayedStack playedStack = new PlayedStack();
+    private static final Deck deck = new Deck();
+    private static final PlayedStack playedStack = new PlayedStack();
     private static String username;
+    private static String hostAdress;
 
     private static Stage chatStage;
     private static boolean chatOpen = false;
@@ -78,6 +86,7 @@ public class MainApp extends Application {
         if (connectionInfo.isPresent()) {
             ConnectionInfo info = connectionInfo.get();
             initRootLayout(Precision.round(info.getScale(), 2));
+            hostAdress = info.getHost();
             RabbitMQManager.init(info.getHost(), 5672, "card_engine", "pgN4KRTrc74");
             JsonObject response = JsonParser.parseString(RabbitMQManager.connect(info.getName())).getAsJsonObject();
             username = info.getName();
@@ -99,6 +108,7 @@ public class MainApp extends Application {
                 String value = object.get("value").getAsString();
                 playedStack.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
+            loadEmotes(response.get("emotes").getAsJsonArray());
             primaryStage.setTitle(info.getHost() + " - " + username);
             RabbitMQManager.listenGameUpdate();
             RabbitMQManager.listenChatUpdate();
@@ -158,6 +168,59 @@ public class MainApp extends Application {
             e.printStackTrace();
         }
 
+    }
+
+    private void loadEmotes(JsonArray array) {
+        Pair<ProgressBar, Label> pair = DialogUtils.loadingInfo();
+
+        Thread thread = new Thread(() -> {
+            File emoteFolder = new File(rootFolder.getAbsolutePath() + "/emotes/");
+            if (!emoteFolder.exists())
+                emoteFolder.mkdir();
+
+            int size = array.size();
+            int current = 1;
+            for (JsonElement element : array) {
+                JsonObject emote = element.getAsJsonObject();
+                String name = emote.get("name").getAsString();
+                File f = new File(emoteFolder.getAbsolutePath() + "/" + name + ".png");
+                int finalCurrent = current;
+                Platform.runLater(() -> {
+                    pair.getValue().setText("Loading " + f.getAbsolutePath());
+                    pair.getKey().setProgress((double) finalCurrent / (double) size);
+                });
+                if (!f.exists()) {
+                    downloadEmote(name);
+                }
+                Image image = new Image(f.toURI().toString());
+                Emote.getEmotes().put(name, new Emote(name, image));
+                current++;
+            }
+        }, "emote_load");
+
+        thread.start();
+    }
+
+    private void downloadEmote(String name) {
+        try {
+            System.out.println("Downloading " + name);
+            URL url = new URL("http://" + hostAdress + ":5673/emotes/" + name + ".png");
+            InputStream in = new BufferedInputStream(url.openStream());
+            File file = new File(rootFolder.getAbsolutePath() + "/emotes/" + name + ".png");
+            System.out.println(file.getAbsolutePath());
+            if (!file.exists())
+                file.createNewFile();
+            FileOutputStream out = new FileOutputStream(file);
+            byte[] buf = new byte[1024];
+            int n = 0;
+            while (-1 != (n = in.read(buf))) {
+                out.write(buf, 0, n);
+            }
+            out.close();
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void toggleChat() {

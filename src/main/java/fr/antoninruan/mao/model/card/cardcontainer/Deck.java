@@ -1,10 +1,10 @@
-package fr.antoninruan.mao.model.cardcontainer;
+package fr.antoninruan.mao.model.card.cardcontainer;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import fr.antoninruan.mao.MainApp;
-import fr.antoninruan.mao.model.Card;
+import fr.antoninruan.mao.model.card.Card;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,13 +30,13 @@ public class Deck extends CardContainer {
 //    }
 
     public int getSize() {
-        return keys.size();
+        return super.keys.size();
     }
 
     public Card getLastCard() {
-        if(keys.isEmpty())
+        if (super.keys.isEmpty())
             return null;
-        return keys.get(keys.size() - 1);
+        return super.keys.get(super.keys.size() - 1);
     }
 
     @Override
@@ -52,30 +52,30 @@ public class Deck extends CardContainer {
     }
 
     public void removeLast() {
-        if(keys.isEmpty())
+        if (super.keys.isEmpty())
             return;
 
-        keys.remove(keys.size() - 1);
+        super.keys.remove(super.keys.size() - 1);
     }
     @Override
     public void moveCardTo(Card card, CardContainer dest) {
-        ImageView view = (ImageView) this.container.getChildren().get(this.container.getChildren().size() - 1);
-        this.keys.remove(card);
-        MainApp.getRootController().animateMove(.3, container, view, dest.container, () -> {
+        ImageView view = (ImageView) super.container.getChildren().get(super.container.getChildren().size() - 1);
+        super.keys.remove(card);
+        MainApp.getRootController().animateMove(.3, super.container, view, dest.container, () -> {
             dest.add(card);
-            container.getChildren().remove(view);
+            super.container.getChildren().remove(view);
         });
     }
 
     public void setFromJson(JsonArray jsonArray) {
         Platform.runLater(() -> {
-            MainApp.getRootController().removeDeckCard(this.keys.size());
-            this.keys.clear();
+            MainApp.getRootController().removeDeckCard(super.keys.size());
+            super.keys.clear();
             for (JsonElement element : jsonArray) {
                 JsonObject object = element.getAsJsonObject();
                 String suit = object.get("suit").getAsString();
                 String value = object.get("value").getAsString();
-                this.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
+                super.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
         });
     }

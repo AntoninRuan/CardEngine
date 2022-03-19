@@ -1,6 +1,6 @@
-package fr.antoninruan.mao.model.cardcontainer;
+package fr.antoninruan.mao.model.card.cardcontainer;
 
-import fr.antoninruan.mao.model.Card;
+import fr.antoninruan.mao.model.card.Card;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;

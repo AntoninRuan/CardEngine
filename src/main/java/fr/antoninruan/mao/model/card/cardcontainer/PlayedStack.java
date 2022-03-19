@@ -1,7 +1,7 @@
-package fr.antoninruan.mao.model.cardcontainer;
+package fr.antoninruan.mao.model.card.cardcontainer;
 
 import fr.antoninruan.mao.MainApp;
-import fr.antoninruan.mao.model.Card;
+import fr.antoninruan.mao.model.card.Card;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.util.Pair;
@@ -38,24 +38,24 @@ public class PlayedStack extends CardContainer {
     }
 
     public void clear() {
-        for(Card c : new ArrayList<>(keys)) {
+        for (Card c : new ArrayList<>(super.keys)) {
             remove(c);
         }
     }
 
     public Card getLastCard() {
-        return keys.get(keys.size() - 1);
+        return super.keys.get(super.keys.size() - 1);
     }
 
     @Override
     public void moveCardTo(Card card, CardContainer dest) {
         Pair<ImageView, ImageView> views = cards.get(card);
-        this.keys.remove(card);
+        super.keys.remove(card);
         this.cards.remove(card);
         Platform.runLater(() -> MainApp.getRootController().removeCardHistory(views.getValue()));
-        MainApp.getRootController().animateMove(.3, container, views.getKey(), dest.container, () -> {
+        MainApp.getRootController().animateMove(.3, super.container, views.getKey(), dest.container, () -> {
             dest.add(card);
-            container.getChildren().remove(views.getKey());
+            super.container.getChildren().remove(views.getKey());
         });
     }
 }

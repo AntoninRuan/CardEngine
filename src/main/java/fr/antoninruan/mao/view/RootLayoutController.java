@@ -2,9 +2,9 @@ package fr.antoninruan.mao.view;
 
 import com.google.gson.JsonObject;
 import fr.antoninruan.mao.MainApp;
-import fr.antoninruan.mao.model.Card;
-import fr.antoninruan.mao.model.cardcontainer.Deck;
-import fr.antoninruan.mao.model.cardcontainer.Hand;
+import fr.antoninruan.mao.model.card.Card;
+import fr.antoninruan.mao.model.card.cardcontainer.Deck;
+import fr.antoninruan.mao.model.card.cardcontainer.Hand;
 import fr.antoninruan.mao.utils.rabbitmq.RabbitMQManager;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
