@@ -108,7 +108,7 @@ public class MainApp extends Application {
                 String value = object.get("value").getAsString();
                 playedStack.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
-            loadEmotes(response.get("emotes").getAsJsonArray());
+//            loadEmotes(response.get("emotes").getAsJsonArray());
             primaryStage.setTitle(info.getHost() + " - " + username);
             RabbitMQManager.listenGameUpdate();
             RabbitMQManager.listenChatUpdate();

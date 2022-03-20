@@ -38,24 +38,24 @@ public class PlayedStack extends CardContainer {
     }
 
     public void clear() {
-        for (Card c : new ArrayList<>(super.keys)) {
+        for (Card c : new ArrayList<>(keys)) {
             remove(c);
         }
     }
 
     public Card getLastCard() {
-        return super.keys.get(super.keys.size() - 1);
+        return keys.get(keys.size() - 1);
     }
 
     @Override
     public void moveCardTo(Card card, CardContainer dest) {
         Pair<ImageView, ImageView> views = cards.get(card);
-        super.keys.remove(card);
+        this.keys.remove(card);
         this.cards.remove(card);
         Platform.runLater(() -> MainApp.getRootController().removeCardHistory(views.getValue()));
-        MainApp.getRootController().animateMove(.3, super.container, views.getKey(), dest.container, () -> {
+        MainApp.getRootController().animateMove(.3, container, views.getKey(), dest.container, () -> {
             dest.add(card);
-            super.container.getChildren().remove(views.getKey());
+            container.getChildren().remove(views.getKey());
         });
     }
 }

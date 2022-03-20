@@ -91,17 +91,17 @@ public class Hand extends CardContainer {
     @Override
     public void moveCardTo(Card card, CardContainer dest) {
         ImageView view = cards.get(card);
-        super.keys.remove(card);
+        this.keys.remove(card);
         this.cards.remove(card);
         Platform.runLater(this::updateHand);
-        MainApp.getRootController().animateMove(.3, super.container, view, dest.container, () -> {
+        MainApp.getRootController().animateMove(.3, container, view, dest.container, () -> {
             dest.add(card);
-            super.container.getChildren().remove(view);
+            container.getChildren().remove(view);
         });
     }
 
     public Card getCard(int id) {
-        return super.keys.get(id);
+        return keys.get(id);
     }
 
     public ImageView getView(Card card) {
