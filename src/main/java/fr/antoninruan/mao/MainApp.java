@@ -41,7 +41,6 @@ public class MainApp extends Application {
 
     // TODO trier ses cartes
     // TODO ajoute réglage volume sonore
-    // TODO chat
 
     private static final double HEIGHT = 850;
     private static final double WIDTH = 1383;
@@ -108,7 +107,7 @@ public class MainApp extends Application {
                 String value = object.get("value").getAsString();
                 playedStack.add(Card.getCard(Card.Suit.valueOf(suit), Card.Value.valueOf(value)));
             }
-//            loadEmotes(response.get("emotes").getAsJsonArray());
+            loadEmotes(response.get("emotes").getAsJsonArray());
             primaryStage.setTitle(info.getHost() + " - " + username);
             RabbitMQManager.listenGameUpdate();
             RabbitMQManager.listenChatUpdate();
