@@ -53,6 +53,7 @@ public class MainApp extends Application {
             new MediaPlayer(new Media(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("sound/knock.mp3")).toString()));
     public static final MediaPlayer RUB_SOUND =
             new MediaPlayer(new Media(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("sound/rub.mp3")).toString()));
+    public static final Image ICON = new Image(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("icon/icon.png")).toString());
     private static final File rootFolder = new File("");
 
     private static RootLayoutController rootController;
@@ -60,13 +61,12 @@ public class MainApp extends Application {
     private static final Deck deck = new Deck();
     private static final PlayedStack playedStack = new PlayedStack();
     private static String username;
-    private static String hostAdress;
+    private static String hostAddress;
 
     private static Stage chatStage;
     private static boolean chatOpen = false;
 
     private static Stage primaryStage;
-    public static final Image ICON = new Image(Objects.requireNonNull(MainApp.class.getClassLoader().getResource("icon.png")).toString());
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -85,7 +85,7 @@ public class MainApp extends Application {
         if (connectionInfo.isPresent()) {
             ConnectionInfo info = connectionInfo.get();
             initRootLayout(Precision.round(info.getScale(), 2));
-            hostAdress = info.getHost();
+            hostAddress = info.getHost();
             RabbitMQManager.init(info.getHost(), 5672, "card_engine", "pgN4KRTrc74");
             JsonObject response = JsonParser.parseString(RabbitMQManager.connect(info.getName())).getAsJsonObject();
             username = info.getName();
@@ -203,7 +203,7 @@ public class MainApp extends Application {
     private void downloadEmote(String name) {
         try {
             System.out.println("Downloading " + name);
-            URL url = new URL("http://" + hostAdress + ":5673/emotes/" + name + ".png");
+            URL url = new URL("https://" + hostAddress + ":5673/emotes/" + name + ".png");
             InputStream in = new BufferedInputStream(url.openStream());
             File file = new File(rootFolder.getAbsolutePath() + "/emotes/" + name + ".png");
             System.out.println(file.getAbsolutePath());
@@ -211,7 +211,7 @@ public class MainApp extends Application {
                 file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
             byte[] buf = new byte[1024];
-            int n = 0;
+            int n;
             while (-1 != (n = in.read(buf))) {
                 out.write(buf, 0, n);
             }
