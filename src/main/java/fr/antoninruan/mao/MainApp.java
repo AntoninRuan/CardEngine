@@ -135,6 +135,7 @@ public class MainApp extends Application {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getClassLoader().getResource("fxml/RootLayout.fxml"));
+            loader.setClassLoader(MainApp.class.getClassLoader());
 
             Pane rootLayout = loader.load();
 
@@ -202,11 +203,9 @@ public class MainApp extends Application {
 
     private void downloadEmote(String name) {
         try {
-            System.out.println("Downloading " + name);
             URL url = new URL("https://" + hostAddress + ":5673/emotes/" + name + ".png");
             InputStream in = new BufferedInputStream(url.openStream());
             File file = new File(rootFolder.getAbsolutePath() + "/emotes/" + name + ".png");
-            System.out.println(file.getAbsolutePath());
             if (!file.exists())
                 file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
@@ -232,6 +231,7 @@ public class MainApp extends Application {
 
         try {
             FXMLLoader loader = new FXMLLoader();
+            loader.setClassLoader(MainApp.class.getClassLoader());
             loader.setLocation(MainApp.class.getClassLoader().getResource("fxml/ChatLayout.fxml"));
 
             AnchorPane pane = loader.load();

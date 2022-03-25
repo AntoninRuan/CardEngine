@@ -25,8 +25,7 @@
 hs_err_pid*
 
 #Programm save file
-*.mcv
-ma_cave.preference
+config.xml
 
 #IDE file
 *.iml

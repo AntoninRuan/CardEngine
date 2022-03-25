@@ -14,10 +14,13 @@ public class ConfigurationCreator {
     public static void main(String[] args) {
 
         Configuration configuration = Configuration.builder()
-                .baseUri("https://antonin-ruan.fr/Mao")
+                .baseUri("https://github.com/AntoninRuan/CardEngine/releases/latest/download")
                 .basePath("${user.dir}")
 
-                .file(FileMetadata.readFrom(new File("").getAbsolutePath() + "/out/artifacts/Mao_jar/Mao.jar").path("Mao.jar").classpath())
+                .file(FileMetadata
+                        .readFrom(new File("").getAbsolutePath() + "/out/artifacts/Mao_jar/Mao.jar")
+                        .path("Mao.jar")
+                        .classpath())
                 .build();
 
         try (Writer out = Files.newBufferedWriter(Paths.get("out/artifacts/Mao_jar/config.xml"))) {
